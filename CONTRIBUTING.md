@@ -3,9 +3,9 @@ There are several ways to contribute to the development of ReactOS. The most oft
 
 ## Documentation
 
-There are some important points if you'd like to help document ReactOS:
+There are some important points if you wouldd like to help document ReactOS:
 
-1.  Make sure the documentation doesn't exist yet (if it does, help improve it).
+1.  Make sure the documentation does not exist yet (if it does, help improve it).
 2.  Respect [clean room reverse engineering] practices.
 3.  Add your knowledge to a place where the other developers can find it.
 
@@ -13,7 +13,7 @@ There are some important points if you'd like to help document ReactOS:
 
 ### Localize bugs
 
-By localizing bugs, developers can identify what causes the bug and what it affects. There are a variety of methods to [debug] ReactOS while testing it. After identifying a bug, check if it is already known about by searching [JIRA] and adding any additional information to the report. If you think that it is an unidentified bug, consider [filing a bug report].
+By localizing bugs, developers can identify what causes the bug and which part it affects. There are a variety of methods to [debug] ReactOS while testing it. After identifying a bug, check if it is already known about by searching on [JIRA] and adding any additional information to the report. If you think that it is an unidentified bug, consider [filing a bug report].
 
 ### Fix bugs
 
@@ -25,7 +25,7 @@ Tests are used to check the functionality and correctness of APIs on ReactOS com
 
 ## Implement new things
 
-Considering ReactOS is alpha quality software, there is a lot of [missing functionality] that Windows operating systems have. Before starting a project to implement something, find out if another person is working on the same thing. If you find that someone is already working on it, ask if any assistance is needed for what specifically is being worked on or a related project. Plenty of times a person will start to implement something and never finish before moving to something else. Make sure you stay committed to what you are going to implement, and do not be afraid to ask for assistance if you need help with something.
+Considering ReactOS is alpha quality software, there is a lot of [missing functionality] that Windows operating systems have. Before starting a project to implement something, find out whether another person is working on the same thing. If you find that someone is already working on it, ask if any assistance is needed for what specifically is being worked on or a related project. More often than not, someone will start to implement something and move onto something else before it's complete. Make sure you stay committed to what you are going to implement, and do not be afraid to ask for assistance if you need help with something.
 
 ## Contribute
 
@@ -33,7 +33,7 @@ Your contribution can be of numerous forms. We currently accept two ways to cont
 
 ### Pull Requests
 
-Since our [migration to GitHub] we gladly accept [Pull Requests]. Pull requests let you tell others about changes you've pushed to a repository on GitHub. Once a pull request is opened, you can discuss and review the potential changes with collaborators and add follow-up commits before the changes are merged into the repository. Pull request is a prefered way to submit your work - it makes reviewing and merging your contribution much easier.
+Since our [migration to GitHub] we gladly accept [Pull Requests]. Pull requests let you tell others about changes you have pushed to a repository on GitHub. Once a pull request is opened, you can discuss and review the potential changes with collaborators and add follow-up commits before the changes are merged into the repository. Pull request is a prefered way to submit your work - it makes reviewing and merging your contribution much easier.
 
 ### Patches
 
@@ -41,16 +41,15 @@ A [patch] is a set of changes to existing source code. The changes in a patch ca
 
 See [Submitting Patches] for details.
 
-### Rules and Recomendations
-Regardless of your way of contributing to ReactOS we have some rules and recomendations:
+### Rules and Recommendations
 
-- Use your __full real name__ and __real email__. We don't accept anonymous contributions!
+- Use your __full real name__ and __real email__. We do not accept anonymous contributions!
 - Ensure your contribution is properly described. Include the relevant issue number if applicable.
 - Put only related changes. It will make reviewing easier as the reviewer needs to recall less information about the existing source code that is changed.
 - Search for similar pull requests/patches before submitting. It may be that a similar pull request or issue was opened previously. Comment and review on that one instead.
 - Keep your contribution small and focused on the topic. It can be tempting to fix existing issues as you come across them while reading the source code. Resist the temptation and put in a note in the source code instead, or (even better) put the issue in the issue tracking system.
 - Respect our Coding Style. See [Coding Style] and [Programming Guidelines] for details on how to write your code.
-- Don't be afraid to ask questions. Ask our developers on JIRA or [IRC] channel.
+- Do not be afraid to ask questions. Ask our developers on JIRA or [IRC] channel.
 
 ## Finding a good project to start
 
