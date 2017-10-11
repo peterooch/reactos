@@ -3,7 +3,7 @@ There are several ways to contribute to the development of ReactOS. The most oft
 
 ## Documentation
 
-There are some important points if you wouldd like to help document ReactOS:
+There are some important points if you would like to help document ReactOS:
 
 1.  Make sure the documentation does not exist yet (if it does, help improve it).
 2.  Respect [clean room reverse engineering] practices.
@@ -21,7 +21,7 @@ Instead of looking for bugs, you can also try to fix a few that are already list
 
 ### Write tests
 
-Tests are used to check the functionality and correctness of APIs on ReactOS compared to Windows implementations. There are also some unit tests that you could help ReactOS pass, which can be found [here][testman].
+Tests are used to check the functionality and correctness of APIs on ReactOS compared to Windows implementations. There are also some unit tests that you could help ReactOS pass, which can be found [in the Web Test Manager][testman].
 
 ## Implement new things
 
@@ -57,7 +57,7 @@ Finding a good project to start with can be a challenge, because when starting o
 
 -   Find a test that fails, and try to make it succeed: <https://www.reactos.org/testman/>
 -   Look around in JIRA, and if you have problems finding nice projects to start with, there is a label for this: <https://jira.reactos.org/issues/?jql=labels%20%3D%20starter-project>
--   Ask for help in [IRC]
+-   Ask for help on [IRC]
 -   Additionally, there are some tests that cause crashes/hangs, but these might be slightly harder: <https://jira.reactos.org/browse/ROSTESTS-125>
 
   [clean room reverse engineering]: https://en.wikipedia.org/wiki/Clean_room_design
@@ -72,8 +72,6 @@ Finding a good project to start with can be a challenge, because when starting o
   [missing functionality]: https://reactos.org/wiki/Missing_ReactOS_Functionality
   [patch]: https://git-scm.com/docs/git-format-patch
   [Submitting Patches]: https://reactos.org/wiki/Submitting_Patches
-  [amend]: https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History
   [Coding Style]: https://reactos.org/wiki/Coding_Style
-  [#reactos]: https://www.reactos.org/irc
   [IRC]: https://reactos.org/wiki/Connect_to_the_ReactOS_IRC_Channels
   [Programming Guidelines]: https://reactos.org/wiki/Programming_Guidelines
