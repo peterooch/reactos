@@ -26,6 +26,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <shellapi.h>
+#include <winnls.h>
 
 #include <wine/debug.h>
 
@@ -465,6 +466,7 @@ static void DrawLeds( HDC hdc, HDC hMemDC, BOARD *p_board, int number, int x, in
     HGDIOBJ hOldObj;
     unsigned led[3], i;
     int count;
+    
 
     count = number;
     if( count < 1000 ) {
@@ -487,7 +489,7 @@ static void DrawLeds( HDC hdc, HDC hMemDC, BOARD *p_board, int number, int x, in
 
     hOldObj = SelectObject (hMemDC, p_board->hLedsBMP);
 
-    for( i = 0; i < 3; i++ ) {
+    for( i = 3; i > 0; i-- ) {
         BitBlt( hdc,
             i * LED_WIDTH + x,
             y,
@@ -1012,6 +1014,16 @@ int WINAPI wWinMain( HINSTANCE hInst, HINSTANCE hPrevInst, LPWSTR cmdline, int c
     WCHAR appname[20];
 
     LoadStringW( hInst, IDS_APPNAME, appname, sizeof(appname)/sizeof(WCHAR));
+    
+    switch (GetUserDefaultUILanguage())
+    {
+        case MAKELANGID(LANG_HEBREW, SUBLANG_DEFAULT):
+            SetProcessDefaultLayout(LAYOUT_RTL);
+            break;
+
+        default:
+            break;
+    }
 
     wc.cbSize = sizeof(wc);
     wc.style = 0;

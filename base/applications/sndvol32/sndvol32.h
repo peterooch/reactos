@@ -10,6 +10,7 @@
 #include <commctrl.h>
 #include <tchar.h>
 #include <assert.h>
+#include <winnls.h>
 
 #include "resources.h"
 

@@ -14,6 +14,8 @@ int     yRowStackCardOffset;
 void CreateSol()
 {
     int i;
+	
+	SetLayout(hdcBitmap,LAYOUT_RTL);
 
 //    hbmBitmap = (HBITMAP)LoadImage(0,"test.bmp",IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
 //    SolWnd.SetBackImage(hbmBitmap);

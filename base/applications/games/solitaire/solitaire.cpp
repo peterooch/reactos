@@ -3,6 +3,7 @@
 #include <winreg.h>
 #include <commctrl.h>
 #include <tchar.h>
+#include <winnls.h>
 
 #include "resource.h"
 
@@ -215,6 +216,16 @@ int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR szCmdLine, int iCm
     wndclass.lpszClassName    = szAppName;
 
     RegisterClass(&wndclass);
+	
+	switch (GetUserDefaultUILanguage())
+    {
+        case MAKELANGID(LANG_HEBREW, SUBLANG_DEFAULT):
+            SetProcessDefaultLayout(LAYOUT_RTL);
+            break;
+
+        default:
+            break;
+    }
 
     ice.dwSize = sizeof(ice);
     ice.dwICC = ICC_BAR_CLASSES;

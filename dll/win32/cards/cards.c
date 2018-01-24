@@ -83,7 +83,7 @@ static __inline VOID BltCard(HDC hdc, INT x, INT y, INT dx, INT dy, HDC hdcCard,
 {
     if (bStretch)
     {
-        StretchBlt(hdc, x, y, dx, dy, hdcCard, 0, 0, CARD_WIDTH, CARD_HEIGHT, dwRasterOp);
+        StretchBlt(hdc, x, y, dx, dy, hdcCard, 0, 0, CARD_WIDTH, CARD_HEIGHT, dwRasterOp | NOMIRRORBITMAP);
     }
     else
     {
