@@ -5,7 +5,6 @@
 #include <winreg.h>
 #include <shellapi.h>
 #include <commctrl.h>
-//#include <winnls.h> worthless include
 
 #define HTMLHELP_PATH(_pt)  TEXT("%systemroot%\\Help\\calc.chm::") TEXT(_pt)
 
@@ -1790,17 +1789,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
     InitCommonControls();
 
     calc.hInstance = hInstance;
-    
-    /*switch (GetUserDefaultUILanguage())
-    {
-        case MAKELANGID(LANG_HEBREW, SUBLANG_DEFAULT):
-            SetProcessDefaultLayout(LAYOUT_RTL);
-            break;
 
-        default:
-            break;
-    }*/
-    
     calc.x_coord = -1;
     calc.y_coord = -1;
 

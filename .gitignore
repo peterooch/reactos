@@ -1,14 +1,2 @@
 output-*
 modules/optional
-base/applications/calc/RCa09544
-base/applications/charmap_new/.vs/charmap_new/v15/.suo
-base/applications/charmap_new/.vs/charmap_new/v15/Browse.VC.db
-base/applications/charmap_new/.vs/charmap_new/v15/ipch/AutoPCH/21a5b1756c9f7fc0/CHARMAP.ipch
-base/applications/charmap_new/.vs/charmap_new/v15/ipch/AutoPCH/4a160e0e62d0bbc1/GRIDVIEW.ipch
-base/applications/charmap_new/.vs/charmap_new/v15/ipch/AutoPCH/54828e7e5206020b/MAINWINDOW.ipch
-base/applications/charmap_new/.vs/charmap_new/v15/ipch/AutoPCH/ebd2ecb6ded3bd2a/CELL.ipch
-base/applications/charmap_new/.vs/ProjectSettings.json
-base/applications/charmap_new/.vs/VSWorkspaceState.json
-base/applications/charmap_new/.vs/slnx.sqlite
-media/themes/blackshade.msstyles/bitmaps/Thumbs.db
-win32ss/user/user32/resources/Thumbs.db

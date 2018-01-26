@@ -27,7 +27,6 @@
 
 #include <shellapi.h>
 
-
 HINSTANCE hAppInstance;
 ATOM MainWindowClass;
 HWND hMainWnd;
@@ -1153,7 +1152,6 @@ _tWinMain(HINSTANCE hInstance,
 
     hAppInstance = hInstance;
     hAppHeap = GetProcessHeap();
-    
 
     if (InitAppConfig())
     {
