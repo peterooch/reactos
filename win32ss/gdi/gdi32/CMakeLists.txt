@@ -22,6 +22,7 @@ list(APPEND SOURCE
     misc/misc.c
     misc/wingl.c
     objects/arc.c
+	objects/bidi.c
     objects/bitmap.c
     objects/brush.c
     objects/clientobj.c
@@ -43,6 +44,17 @@ list(APPEND SOURCE
     objects/text.c
     objects/utils.c
     objects/path.c
+	objects/fribidi/fribidi.c
+	objects/fribidi/fribidi-arabic.c
+	objects/fribidi/fribidi-bidi.c
+	objects/fribidi/fribidi-bidi-types.c
+	objects/fribidi/fribidi-brackets.c
+	objects/fribidi/fribidi-fribidi-charsets-utf8.c
+	objects/fribidi/fribidi-joining.c
+	objects/fribidi/fribidi-joining-types.c
+	objects/fribidi/fribidi-mirroring.c
+	objects/fribidi/fribidi-run.c
+	objects/fribidi/fribidi-shape.c
     include/precomp.h)
 
 add_library(gdi32 SHARED
