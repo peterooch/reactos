@@ -157,6 +157,7 @@ list(APPEND SOURCE
     gdi/ntgdi/arc.c
     gdi/ntgdi/bezier.c
     gdi/ntgdi/bitblt.c
+    gdi/ntgdi/bidi.c
     gdi/ntgdi/bitmaps.c
     gdi/ntgdi/cliprgn.c
     gdi/ntgdi/coord.c

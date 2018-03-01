@@ -32,7 +32,7 @@
 
 #include <gdi/eng/floatobj.h>
 #include "font.h"
-
+#include "gdi_private.h"
 #define NDEBUG
 #include <debug.h>
 
@@ -5105,6 +5105,9 @@ GreExtTextOutW(
     BOOL EmuBold, EmuItalic;
     int thickness;
     BOOL bResult;
+    LPCWSTR reordered_str = (LPCWSTR)String;
+    WORD *glyphs = NULL;
+    UINT align;
 
     /* Check if String is valid */
     if ((Count > 0xFFFF) || (Count > 0 && String == NULL))
@@ -5113,6 +5116,38 @@ GreExtTextOutW(
         return FALSE;
     }
 
+    /* BIDI_Reorder test */
+    
+    /* where to put this?
+    align = dc->textAlign;*/
+    
+        if (fuOptions & ETO_RTLREADING) align |= TA_RTLREADING;
+    if (layout & LAYOUT_RTL)
+    {
+        if ((align & TA_CENTER) != TA_CENTER) align ^= TA_RIGHT;
+        align ^= TA_RTLREADING;
+    }
+
+    if( !(fuOptions & (ETO_GLYPH_INDEX | ETO_IGNORELANGUAGE)) && count > 0 )
+    {
+        INT cGlyphs;
+        reordered_str = HeapAlloc(GetProcessHeap(), 0, count*sizeof(WCHAR));
+
+        BIDI_Reorder( hDC, String, Count, GCP_REORDER,
+                      (align & TA_RTLREADING) ? WINE_GCPW_FORCE_RTL : WINE_GCPW_FORCE_LTR,
+                      reordered_str, Count, NULL, &glyphs, &cGlyphs);
+
+        fuOptions |= ETO_IGNORELANGUAGE;
+        if (glyphs)
+        {
+            fuOptions |= ETO_GLYPH_INDEX;
+            if (cGlyphs != count)
+                count = cGlyphs;
+        }
+    }
+    else if(fuOptions & ETO_GLYPH_INDEX)
+        glyphs = reordered_str;
+    
     /* NOTE: This function locks the screen DC, so it must never be called
        with a DC already locked */
     Render = IntIsFontRenderingEnabled();
@@ -5133,7 +5168,7 @@ GreExtTextOutW(
                               YStart,
                               fuOptions,
                               (const RECTL *)lprc,
-                              String,
+                              reordered_str,
                               Count,
                               (const INT *)Dx);
         DC_UnlockDc(dc);
@@ -5294,7 +5329,7 @@ GreExtTextOutW(
     if (pdcattr->lTextAlign & (TA_RIGHT | TA_CENTER))
     {
         ULONGLONG TextWidth = 0;
-        LPCWSTR TempText = String;
+        LPCWSTR TempText = reordered_str;
         int iStart;
 
         /*
@@ -5310,7 +5345,7 @@ GreExtTextOutW(
         {
             iStart = 0;
         }
-        TempText = String + iStart;
+        TempText = reordered_str + iStart;
 
         for (i = iStart; i < Count; i++)
         {
@@ -5420,9 +5455,9 @@ GreExtTextOutW(
         for (i = 0; i < Count; ++i)
         {
             if (fuOptions & ETO_GLYPH_INDEX)
-                glyph_index = String[i];
+                glyph_index = reordered_str[i];
             else
-                glyph_index = FT_Get_Char_Index(face, String[i]);
+                glyph_index = FT_Get_Char_Index(face, reordered_str[i]);
 
             error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
             if (error)
@@ -5538,9 +5573,9 @@ GreExtTextOutW(
     for (i = 0; i < Count; ++i)
     {
         if (fuOptions & ETO_GLYPH_INDEX)
-            glyph_index = String[i];
+            glyph_index = reordered_str[i];
         else
-            glyph_index = FT_Get_Char_Index(face, String[i]);
+            glyph_index = FT_Get_Char_Index(face, reordered_str[i]);
 
         if (EmuBold || EmuItalic)
             realglyph = NULL;
