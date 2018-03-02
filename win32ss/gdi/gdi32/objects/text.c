@@ -7,6 +7,7 @@
  */
 
 #include <precomp.h>
+#include "bidi.h"
 
 #define NDEBUG
 #include <debug.h>
@@ -500,12 +501,16 @@ ExtTextOutW(
                   cwc,
                   lpDx);
 
+	//Bidifying the string
+	LPCWSTR lpReorderedString = BiDi_string(lpString, cwc);
+	
+
     return NtGdiExtTextOutW(hdc,
                             x,
                             y,
                             fuOptions,
                             (LPRECT)lprc,
-                            (LPWSTR)lpString,
+                            (LPWSTR)lpReorderedString,
                             cwc,
                             (LPINT)lpDx,
                             0);

@@ -10,27 +10,33 @@
 #include "precomp.h"
  
 LPCWSTR BiDi_string(
-    LPCWSTR lpinString, UINT count)
+	LPCWSTR lpinString, UINT count)
 {
-    LPCWSTR workstr = lpString;
-    LPCWSTR retstr;
-    FriBidiCharType biditypes;
-    FriBidiParType base_dir;
-    FriBidiLevel embedding_levels;
-    
+	LPWSTR workstr;
+	LPWSTR retstr[count];
+	FriBidiCharType biditypes;
+	FriBidiParType basedir;
+	FriBidiLevel embeddinglevels;
+	FriBidiStrIndex len;
+	FriBidiStrIndex off;
+	
+	for (len == 0; len <= count; len++)
+	{
+		wcscat(workstr, lpinString[len]);
 
-    
-    
-    fribidi_reorder_line (
-  /* input */
-  FriBidiFlags flags, /* reorder flags */
-  const FriBidiCharType *bidi_types, //fribidi_get_bidi_types()
-  const FriBidiStrIndex len,
-  const FriBidiStrIndex off,
-  const FriBidiParType base_dir,
-  /* input and output */
-  FriBidiLevel *embedding_levels,//fribidi_get_par_embedding_levels
-  workstr,
-  /* output */
-  NULL;
-)
+		if (lpinString[len] == '\n' || len == count)
+		{
+			fribidi_get_bidi_types(workstr; len; biditypes);
+			fribidi_get_par_embedding_levels(biditypes, off, basdir, embeddinglevels);
+			off = sizeof(workstr);
+			
+			fribidi_reorder_line(FRIBIDI_FLAGS_DEFAULT, biditypes, off, 0, basedir, embeddinglevels, workstr, NULL);
+
+			wcscat(retstr, workstr);
+			wcscpy(workstr, "");
+			continue;
+		}
+
+	}
+	return (LPCWSTR)retstr;
+}
