@@ -49,7 +49,7 @@ list(APPEND SOURCE
 	objects/fribidi/fribidi-bidi.c
 	objects/fribidi/fribidi-bidi-types.c
 	objects/fribidi/fribidi-brackets.c
-	objects/fribidi/fribidi-fribidi-charsets-utf8.c
+	objects/fribidi/fribidi-char-sets-utf8.c
 	objects/fribidi/fribidi-joining.c
 	objects/fribidi/fribidi-joining-types.c
 	objects/fribidi/fribidi-mirroring.c
