@@ -39,9 +39,9 @@
 /* Unicode version - FRIBIDI_UNICODE_VERSION */
 #ifdef DONT_HAVE_FRIBIDI_UNICODE_VERSION_H
 # define FRIBIDI_UNICODE_VERSION "unknown"
-#else /* !DONT_HAVE_FRIBIDI_UNICODE_VERSION_H */
-# include "fribidi-unicode-version.h"
-#endif /* !DONT_HAVE_FRIBIDI_UNICODE_VERSION_H */
+//#else /* !DONT_HAVE_FRIBIDI_UNICODE_VERSION_H */
+//# include "fribidi-unicode-version.h"
+//#endif /* !DONT_HAVE_FRIBIDI_UNICODE_VERSION_H */
 
 /* An string containing the version the Unicode standard implemented,
  * in the form of "x.y.z", or "unknown". */

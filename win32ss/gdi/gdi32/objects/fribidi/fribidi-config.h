@@ -18,6 +18,6 @@
 #define FRIBIDI_SIZEOF_INT @SIZEOF_INT@
 
 /* Define if fribidi was built with MSVC */
-@FRIBIDI_MSVC_BUILD_PLACEHOLDER@
+//@FRIBIDI_MSVC_BUILD_PLACEHOLDER@
 
 #endif /* FRIBIDI_CONFIG_H */
