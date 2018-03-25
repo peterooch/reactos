@@ -1,4 +1,4 @@
 #include "precomp.h"
 #include "fribidi/fribidi.h"
 
-extern LPCWSTR BiDi_string(LPCWSTR lpinString, UINT count);
+extern LPWSTR BiDi_string(LPWSTR lpinString, UINT count);

@@ -502,15 +502,15 @@ ExtTextOutW(
                   lpDx);
 
 	//Bidifying the string
-	LPCWSTR lpReorderedString = BiDi_string(lpString, cwc);
-	
+	LPWSTR lpReorderedString = BiDi_string(lpString, cwc);
+
 
     return NtGdiExtTextOutW(hdc,
                             x,
                             y,
                             fuOptions,
                             (LPRECT)lprc,
-                            (LPWSTR)lpReorderedString,
+                            lpReorderedString,
                             cwc,
                             (LPINT)lpDx,
                             0);
