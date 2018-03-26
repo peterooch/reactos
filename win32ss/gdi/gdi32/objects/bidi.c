@@ -8,7 +8,7 @@
 #include "bidi.h"
 #include "precomp.h"
 
-BOOL BiDi_string(
+VOID BiDi_string(
 	LPWSTR lpinString, UINT uCount)
 {
 	//Variables
@@ -32,14 +32,12 @@ BOOL BiDi_string(
 		//if newline detected or reached end of string
 		if ((WCHAR)lpinString[len] == L"\n" || len == uCount)
 		{
-			off = sizeof(workstr);
+			off = wcslen((LPWSTR)workstr);
 			biditypes = malloc(off * sizeof biditypes[0]);
 			embeddinglevels = malloc(off * sizeof embeddinglevels[0]);
 
 			fribidi_get_bidi_types(workstr, len, biditypes);
 			fribidi_get_par_embedding_levels(biditypes, off, basedir, embeddinglevels);
-			
-
 			fribidi_reorder_line(FRIBIDI_FLAGS_DEFAULT, biditypes, off, 0, basedir, embeddinglevels, workstr, NULL);
 
 			//now copy the temporary line string to the main "processing" string
@@ -47,7 +45,6 @@ BOOL BiDi_string(
 			{
 				retstr[retcount] = workstr[i];
 			}
-			continue;
 
 			free(biditypes);
 			free(embeddinglevels);
@@ -61,5 +58,4 @@ BOOL BiDi_string(
 	}
 
 	wcscpy_s(lpinString, uCount, szOutString);
-	return TRUE;
 }

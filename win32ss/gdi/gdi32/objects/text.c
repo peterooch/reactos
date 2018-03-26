@@ -489,11 +489,15 @@ ExtTextOutW(
     _In_ UINT cwc,
     _In_reads_opt_(cwc) const INT *lpDx)
 {
-    
+
     LPWSTR lpReorderedString = (LPWSTR)lpString;
-    //Bidifying the string
+    /* Bidifying the string if there isn't a ETO_IGNORELANGUAGE flag or ETO_GLYPH_INDEX uiFlags
+    for example a ScriptTextOut call from usp10 */
+    if(fuOptions & ETO_GLYPH_INDEX || fuOptions  & ETO_IGNORELANGUAGE)
+    {
     BiDi_string(lpReorderedString, cwc);
-    
+    }
+
     HANDLE_METADC(BOOL,
                   ExtTextOut,
                   FALSE,
@@ -502,12 +506,12 @@ ExtTextOutW(
                   y,
                   fuOptions,
                   lprc,
-                  lpString,
+                  lpReorderedString,
                   cwc,
                   lpDx);
 
-	
-    
+
+
 
     return NtGdiExtTextOutW(hdc,
                             x,
