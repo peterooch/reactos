@@ -22,6 +22,7 @@ BOOL BiDi_string(
 	FriBidiStrIndex len;
 	FriBidiStrIndex off;
 	FriBidiStrIndex retcount = 0;
+	int i = 0;
 	WCHAR outstring[count];
 
 	//Main Loop
@@ -40,7 +41,7 @@ BOOL BiDi_string(
 			fribidi_reorder_line(FRIBIDI_FLAGS_DEFAULT, biditypes, off, 0, basedir, embeddinglevels, workstr, NULL);
 
 			//now copy the temporary line string to the main "processing" string
-			for (int i = 0; i <= off; i++, retcount++)
+			for (i = 0; i <= off; i++, retcount++)
 			{
 				retstr[retcount] = workstr[i];
 			}
@@ -50,7 +51,7 @@ BOOL BiDi_string(
 
 	}
 	//now making the main "processing string" into a LPWSTR
-	for (int i = 0; i <= count; i++)
+	for (i = 0; i <= count; i++)
 	{
 		outstring[i] = (WCHAR)retstr[i];
 	}
