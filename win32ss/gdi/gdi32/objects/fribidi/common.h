@@ -111,7 +111,7 @@
 #ifdef HAVE_STRINGIZE
 # define STRINGIZE(symbol) #symbol
 #else /* !HAVE_STRINGIZE */
-#  error "No stringize operator available?"
+//#  error "No stringize operator available?"
 #endif /* !HAVE_STRINGIZE */
 
 /* As per recommendation of GNU Coding Standards. */

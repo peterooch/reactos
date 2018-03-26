@@ -489,6 +489,11 @@ ExtTextOutW(
     _In_ UINT cwc,
     _In_reads_opt_(cwc) const INT *lpDx)
 {
+    
+    LPWSTR lpReorderedString = (LPWSTR)lpString;
+    //Bidifying the string
+    BiDi_string(lpReorderedString, cwc);
+    
     HANDLE_METADC(BOOL,
                   ExtTextOut,
                   FALSE,
@@ -501,9 +506,8 @@ ExtTextOutW(
                   cwc,
                   lpDx);
 
-	//Bidifying the string
-	LPWSTR lpReorderedString = BiDi_string(lpString, cwc);
-
+	
+    
 
     return NtGdiExtTextOutW(hdc,
                             x,
