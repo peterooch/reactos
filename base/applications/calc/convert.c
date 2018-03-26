@@ -371,6 +371,7 @@ static const conv_t conv_TEMPERATURE[] = {
     1 knot = 18.52/36 m/s -> 0.51444444 m/s
     1 mach = 340.3 m/s
     1 mph  = 0.44704 m/s
+    "1" light second = 299,792,458 m/s 
 */
 static const conv_t conv_VELOCITY[] = {
     DECLARE_CONV_UNIT(VELOCITY, CMS_SECOND,         "$*.01",      "$/.01")
@@ -381,6 +382,7 @@ static const conv_t conv_VELOCITY[] = {
     DECLARE_CONV_UNIT(VELOCITY, MACH,               "$*340.3",    "$/340.3")
     DECLARE_CONV_UNIT(VELOCITY, METERS_SECOND,      "$",          "$")
     DECLARE_CONV_UNIT(VELOCITY, MILES_HOUR,         "$*.44704",   "$/.44704")
+    DECLARE_CONV_UNIT(VELOCITY, LIGHT_SECOND,       "$*299792458",   "$/299792458")
     DECLARE_CONV_END
 };
 

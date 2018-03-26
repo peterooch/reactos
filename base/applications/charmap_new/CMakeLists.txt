@@ -22,6 +22,6 @@ add_library(charmap SHARED
 
 set_module_type(charmap win32gui UNICODE)
 target_link_libraries(charmap uuid atlnew wine)
-add_importlibs(charmap advapi32 user32 gdi32 comctl32 version msvcrt kernel32 ole32 uxtheme ntdll)
+add_importlibs(charmap advapi32 user32 gdi32 comctl32 version msvcrt kernel32 ole32 uxtheme ntdll getuname)
 add_pch(charmap precomp.h SOURCE)
 add_cd_file(TARGET charmap DESTINATION reactos/system32 FOR all)

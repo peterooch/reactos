@@ -634,6 +634,7 @@ BEGIN
     IDS_VELOCITY_MACH "Mach"
     IDS_VELOCITY_METERS_SECOND "Meters/second"
     IDS_VELOCITY_MILES_HOUR "Miles/hour"
+    IDS_VELOCITY_LIGHT_SECOND "Speed of light"
 END
 
 /* Volumes */

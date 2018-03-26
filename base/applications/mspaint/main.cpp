@@ -177,6 +177,16 @@ _tWinMain (HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPTSTR lpszArgument
     hfontTextFont = CreateFontIndirect(&lfTextFont);
 
     hProgInstance = hThisInstance;
+	
+	switch (GetUserDefaultUILanguage())
+    {
+        case MAKELANGID(LANG_HEBREW, SUBLANG_DEFAULT):
+            SetProcessDefaultLayout(LAYOUT_RTL);
+            break;
+
+        default:
+            break;
+    }
 
     /* initialize common controls library */
     InitCommonControls();

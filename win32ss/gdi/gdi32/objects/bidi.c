@@ -11,30 +11,30 @@
 
 
 BOOL BiDi_string(
-	LPWSTR lpinString, UINT count)
+	LPWSTR lpinString, UINT uCount)
 {
 	//Variables
 	FriBidiChar workstr[256];
-	FriBidiChar retstr[count];
-	FriBidiCharType *biditypes;
+	FriBidiChar retstr[uCount];
+	FriBidiCharType biditypes[uCount];
 	FriBidiParType *basedir;
 	FriBidiLevel *embeddinglevels;
 	FriBidiStrIndex len;
 	FriBidiStrIndex off;
 	FriBidiStrIndex retcount = 0;
-	int i = 0;
-	WCHAR outstring[count];
+	FriBidiStrIndex i = 0;
+	WCHAR szOutString[uCount];
 
 	//Main Loop
-	for (len == 0; len <= count; len++)
+	for (len == 0; len <= uCount; len++)
 	{
 		//Copy character to temporary line string
 		workstr[len] = (FriBidiChar)lpinString[len];
 
 		//if newline detected or reached end of string
-		if (lpinString[len] == '\n' || len == count)
+		if ((WCHAR)lpinString[len] == L"\n" || len == uCount)
 		{
-			fribidi_get_bidi_types(workstr; len; biditypes);
+			fribidi_get_bidi_types(workstr, len, biditypes);
 			fribidi_get_par_embedding_levels(biditypes, off, basedir, embeddinglevels);
 			off = sizeof(workstr);
 
@@ -45,17 +45,16 @@ BOOL BiDi_string(
 			{
 				retstr[retcount] = workstr[i];
 			}
-			workstr = NULL;
 			continue;
 		}
 
 	}
 	//now making the main "processing string" into a LPWSTR
-	for (i = 0; i <= count; i++)
+	for (i = 0; i <= uCount; i++)
 	{
-		outstring[i] = (WCHAR)retstr[i];
+		szOutString[i] = (WCHAR)retstr[i];
 	}
 
-	wcscpy(lpinString, outstring);
+	wcscpy_s(lpinString, uCount, szOutString);
 	return TRUE;
 }

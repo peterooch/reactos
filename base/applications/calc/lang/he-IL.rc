@@ -427,7 +427,7 @@ BEGIN
     IDS_CONV_PRESSURE "לחץ"
     IDS_CONV_TEMPERATURE "טמפרטורה"
     IDS_CONV_TIME "זמן"
-    IDS_CONV_VELOCITY "תאוצה"
+    IDS_CONV_VELOCITY "מהירות"
     IDS_CONV_VOLUME "נפח"
     IDS_CONV_WEIGHT "משקל"
 END
@@ -640,6 +640,7 @@ BEGIN
     IDS_VELOCITY_MACH "מאך"
     IDS_VELOCITY_METERS_SECOND "מטרים/שניה"
     IDS_VELOCITY_MILES_HOUR "מיילים/שעה"
+    IDS_VELOCITY_LIGHT_SECOND "שנית אור"
 END
 
 /* Volumes */
@@ -685,7 +686,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_WEIGHT_BAHT "Baht"
-    IDS_WEIGHT_CARATS "Carats"
+    IDS_WEIGHT_CARATS "קראט"
     IDS_WEIGHT_CHUNG "Chung"
     IDS_WEIGHT_DON "Don"
     IDS_WEIGHT_GEUN "Geun"
