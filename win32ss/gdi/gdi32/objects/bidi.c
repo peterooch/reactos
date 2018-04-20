@@ -15,7 +15,7 @@ VOID BiDi_string(
 	FriBidiChar workstr[256];
 	FriBidiChar retstr[uCount];
 	FriBidiCharType *biditypes = NULL;
-	FriBidiParType *basedir;
+	FriBidiParType basedir = FRIBIDI_PAR_LTR;
 	FriBidiLevel *embeddinglevels = NULL;
 	FriBidiStrIndex len;
 	FriBidiStrIndex off;
