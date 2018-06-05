@@ -45,6 +45,7 @@
 #include "ros_lpk.h"
 #include "wine/unicode.h"
 #include "wine/debug.h"
+#include <strsafe.h>
 //#include "config.h"
 //#include "gdi_private.h"
 
@@ -370,9 +371,11 @@ BOOL BIDI_Reorder(
     DWORD cMaxGlyphs = 0;
     BOOL  doGlyphs = TRUE;
 
+#ifndef __REACTOS__
     TRACE("%s, %d, 0x%08x lpOutString=%p, lpOrder=%p\n",
           debugstr_wn(lpString, uCount), uCount, dwFlags,
           lpOutString, lpOrder);
+#endif
 
     memset(&Control, 0, sizeof(Control));
     memset(&State, 0, sizeof(State));
@@ -399,7 +402,11 @@ BOOL BIDI_Reorder(
     }
 
     if (lpOutString)
+#ifdef __REACTOS__
+        StringCchCopyW(lpOutString, uCount + 1, lpString);
+#else
         memcpy(lpOutString, lpString, uCount * sizeof(WCHAR));
+#endif
 
     is_complex = FALSE;
     for (i = 0; i < uCount && !is_complex; i++)

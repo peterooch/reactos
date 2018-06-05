@@ -5117,11 +5117,82 @@ GreExtTextOutW(
     int thickness;
     BOOL bResult;
 
+    LPWSTR ReorderedString = ExAllocatePoolWithTag(PagedPool, sizeof(WCHAR) * Count, GDITAG_TEXT);
+    //BOOL bIsReordered = FALSE;
+
     /* Check if String is valid */
     if ((Count > 0xFFFF) || (Count > 0 && String == NULL))
     {
         EngSetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
+    }
+
+    if (!(fuOptions & (ETO_IGNORELANGUAGE | ETO_GLYPH_INDEX)))
+    {
+        NTSTATUS Status;
+        ULONG ArgumentLength, ResultLength;
+        PVOID Argument, ResultPointer;
+        PLPK_CALLBACK_ARGUMENTS Common;
+
+        ResultPointer = NULL;
+        ResultLength = ArgumentLength = sizeof(LPK_CALLBACK_ARGUMENTS);
+
+        Argument = IntCbAllocateMemory(ArgumentLength);
+
+        if (Argument == NULL || ReorderedString == NULL)
+            goto done;
+
+        Common = (PLPK_CALLBACK_ARGUMENTS) Argument;
+
+        Common->hdc         = hDC;
+        Common->lpString    = String;
+        Common->lpOutString = ReorderedString;
+        Common->uCount      = Count;
+        Common->uCountOut   = Count;
+        Common->bGlyphs     = FALSE;
+
+        UserLeaveCo();
+
+        Status = KeUserModeCallback(USER32_CALLBACK_LPK,
+                                    Argument,
+                                    ArgumentLength,
+                                    &ResultPointer,
+                                    &ResultLength);
+        
+        if (NT_SUCCESS(Status))
+        {
+            _SEH2_TRY
+            {
+                RtlMoveMemory(Argument, ResultPointer, ArgumentLength);
+            }
+            _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+            {
+                DPRINT("Failed to copy result from user mode!\n");
+                Status = _SEH2_GetExceptionCode();
+            }
+
+            _SEH2_END;
+        }
+
+        UserEnterCo();
+
+        if (!NT_SUCCESS(Status))
+        {
+            DPRINT("Failed LPK usermode callback!\n");
+            goto done;
+        }
+
+        if (Common->bGlyphs)
+            fuOptions |= ETO_GLYPH_INDEX;
+
+        if (Common->lpOutString)
+        {
+            RtlCopyMemory(ReorderedString, Common->lpOutString, sizeof(WCHAR) * Common->uCountOut);
+            //bIsReordered = TRUE;
+        }
+
+        done:
+        IntCbFreeMemory(Argument);
     }
 
     /* NOTE: This function locks the screen DC, so it must never be called

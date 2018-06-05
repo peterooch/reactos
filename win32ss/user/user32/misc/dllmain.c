@@ -205,6 +205,7 @@ PVOID apfnDispatch[USER32_CALLBACK_MAXIMUM + 1] =
     User32CallDDEPostFromKernel,
     User32CallDDEGetFromKernel,
     User32CallOBMFromKernel,
+    User32CallLPKFromKernel,
 };
 
 
@@ -640,4 +641,27 @@ User32CallOBMFromKernel(PVOID Arguments, ULONG ArgumentLength)
   Common->oembmi[OBI_UPARROWI].cy = bmp.bmHeight;
 
   return ZwCallbackReturn(Arguments, ArgumentLength, STATUS_SUCCESS);
+}
+
+NTSTATUS WINAPI User32CallLPKFromKernel(PVOID Arguments, ULONG ArgumentLength)
+{
+    PLPK_CALLBACK_ARGUMENTS Common = Arguments;
+    LPWSTR lpGlyphs = HeapAlloc(GetProcessHeap(), 0, sizeof(WCHAR) * Common->uCount);
+    GCP_RESULTSW gcpResults;
+    gcpResults.lStructSize = sizeof(gcpResults);
+    gcpResults.lpGlyphs = lpGlyphs;
+    gcpResults.lpOutString = Common->lpOutString;
+    gcpResults.nGlyphs = Common->uCountOut;
+
+    GetCharacterPlacementW(Common->hdc, Common->lpString, Common->uCount, 0, &gcpResults, GCP_REORDER); //Reorder here
+
+    if (lpGlyphs)
+    {
+        Common->bGlyphs = TRUE;
+        wcscpy(Common->lpOutString, lpGlyphs);
+    }
+
+    HeapFree(GetProcessHeap(), 0, lpGlyphs);
+
+    return ZwCallbackReturn(Arguments, ArgumentLength, STATUS_SUCCESS);
 }
