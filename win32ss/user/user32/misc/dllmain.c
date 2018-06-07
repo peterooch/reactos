@@ -645,7 +645,7 @@ User32CallOBMFromKernel(PVOID Arguments, ULONG ArgumentLength)
 
 NTSTATUS WINAPI User32CallLPKFromKernel(PVOID Arguments, ULONG ArgumentLength)
 {
-    PLPK_CALLBACK_ARGUMENTS Common = Arguments;
+    PLPK_CALLBACK_ARGUMENTS Common = (PLPK_CALLBACK_ARGUMENTS) Arguments;
     LPWSTR lpGlyphs = HeapAlloc(GetProcessHeap(), 0, sizeof(WCHAR) * Common->uCount);
     GCP_RESULTSW gcpResults;
     gcpResults.lStructSize = sizeof(gcpResults);
