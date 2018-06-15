@@ -5182,8 +5182,8 @@ GreExtTextOutW(
             goto done;
         }
 
-        if (Common->bGlyphs)
-            fuOptions |= ETO_GLYPH_INDEX;
+        //if (Common->bGlyphs)
+            //fuOptions |= ETO_GLYPH_INDEX;
 
         if (Common->lpOutString)
         {
