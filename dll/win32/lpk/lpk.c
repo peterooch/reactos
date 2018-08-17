@@ -14,6 +14,53 @@ LPK_LPEDITCONTROL_LIST LpkEditControl = {EditCreate,       EditIchToXY,  EditMou
                                          EditVerifyText,   EditNextWord, EditSetMenu,    EditProcessMenu,
                                          EditCreateCaret, EditAdjustCaret};
 
+static BOOL GlyphsMissing(HDC hdc, LPCWSTR lpString, UINT uCount)
+{
+    UINT i;
+    LPWORD lpGlyphs = HeapAlloc(GetProcessHeap(), 0, sizeof(WORD) * uCount);
+
+    if(!lpGlyphs)
+        return FALSE;
+
+    if(GetGlyphIndicesW(hdc, lpString, uCount, lpGlyphs, GGI_MARK_NONEXISTING_GLYPHS) == GDI_ERROR)
+    {
+        HeapFree(GetProcessHeap(), 0, lpGlyphs);
+        return FALSE;
+    }
+
+    for(i = 0; i < uCount; i++)
+    {
+        if(lpGlyphs[i] == 0xFFFF)
+        {
+            HeapFree(GetProcessHeap(), 0, lpGlyphs);
+            return TRUE;
+        }
+    }
+
+    HeapFree(GetProcessHeap(), 0, lpGlyphs);
+    return FALSE;
+}
+
+static HRESULT DrawUniscribe(HDC hdc, INT x, INT y, UINT fuOptions, const RECT *lprc, LPCWSTR lpString, UINT uCount)
+{
+    SCRIPT_STRING_ANALYSIS ssa;
+    HRESULT hr;
+
+    if (uCount == 0)
+        return E_INVALIDARG;
+
+    hr = ScriptStringAnalyse(hdc, lpString, uCount, (1.5 * uCount + 16), -1, SSA_FALLBACK | SSA_GLYPHS, -1, NULL, NULL, NULL, NULL, NULL, &ssa);
+
+    if (FAILED(hr))
+        return hr;
+
+    hr = ScriptStringOut(ssa, x, y, fuOptions, lprc, 0, 0, FALSE);
+    
+    ScriptStringFree(&ssa);
+
+    return hr;
+}
+
 BOOL
 WINAPI
 DllMain(
@@ -86,6 +133,14 @@ LpkExtTextOut(
     /* Check if the string requires complex script processing and not a "glyph indices" array */
     if (ScriptIsComplex(lpString, uCount, dwSICFlags) == S_OK && !(fuOptions & ETO_GLYPH_INDEX))
     {
+        // check if there are any missing glyphs the current hdc font
+        if (GlyphsMissing(hdc, lpString, uCount))
+        {
+            // Attempt to draw the string using the Uniscribe functions that support fallback fonts
+            if (DrawUniscribe(hdc, x, y, fuOptions, lprc, lpString, uCount) == S_OK)
+                return TRUE;
+        }
+
         /* reordered_str is used as fallback in case the glyphs array fails to generate,
            BIDI_Reorder doesn't attempt to write into reordered_str if memory allocation fails */
         reordered_str = HeapAlloc(GetProcessHeap(), 0, uCount * sizeof(WCHAR));
