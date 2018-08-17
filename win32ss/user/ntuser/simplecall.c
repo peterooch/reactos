@@ -402,6 +402,17 @@ NtUserCallOneParam(
             Result = (DWORD_PTR)IntAllowSetForegroundWindow(Param);
             break;
 
+        case ONEPARAM_ROUTINE_REGISTERLPK:
+        {
+            PPROCESSINFO ppi;
+
+            ppi = PsGetCurrentProcessWin32Process();
+            ppi->dwLpkEntryPoints = Param;
+            Result = TRUE;
+
+            break;
+        }
+
         default:
             ERR("Calling invalid routine number 0x%x in NtUserCallOneParam(), Param=0x%x\n",
                 Routine, Param);

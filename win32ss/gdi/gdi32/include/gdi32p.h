@@ -66,6 +66,7 @@ extern LPKGCP LpkGetCharacterPlacement;
 
 #define LPK_ETO 1
 #define LPK_GCP 2
+#define LPK_INIT 3
 
 /* MACRO ********************************************************************/
 
@@ -526,6 +527,10 @@ PVOID
 WINAPI
 GdiRemoveClientObjLink(
     _In_ HGDIOBJ hobj);
+
+VOID WINAPI GdiInitializeLanguagePack(DWORD InitParam);
+
+VOID WINAPI InitializeLpkHooks(FARPROC *hookfuncs);
 
 extern ULONG gcClientObj;
 

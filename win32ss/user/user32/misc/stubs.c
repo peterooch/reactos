@@ -416,11 +416,22 @@ BOOL WINAPI EnterReaderModeHelper(HWND hwnd)
 }
 
 /*
- * @unimplemented
+ * @halfmplemented
  */
 VOID WINAPI InitializeLpkHooks(FARPROC *hookfuncs)
 {
-  UNIMPLEMENTED;
+    DWORD dwLpkEntryPoints = 4L;
+
+    /* By looking via IDA, this function tests for 4 function procedures and ORs a global DWORD:
+       Function name      Assumed Purpose
+       LpkTabbedTextOut,  TabbedTextOutA/W ,
+       LpkPSMTextOut,     (?) Used by DrawStateW, static controls in user32, menu draw in win32k
+       LpkDrawTextEx,     DrawTextEx with BiDi support (somewhat implemented) 
+       LpkEditControl,    Edit control (which already has full BiDi via usp10)
+       each valid procedure ORs the DWORD with 1, 2, 4, 8 respectively 
+       Then ClientThreadSetup checks the value of the DWORD and calls the following call */
+       
+    NtUserCallOneParam(dwLpkEntryPoints, ONEPARAM_ROUTINE_REGISTERLPK);
 }
 
 /*

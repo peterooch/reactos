@@ -417,7 +417,7 @@ EnumLogFontExW2A( LPENUMLOGFONTEXA fontA, CONST ENUMLOGFONTEXW *fontW )
 * LPK.DLL loader function
 * 
 * Returns TRUE if a valid parameter was passed and loading was successful,
-* retruns FALSE otherwise.
+* returns FALSE otherwise.
 */
 BOOL WINAPI LoadLPK(INT LpkFunctionID)
 {   
@@ -450,6 +450,9 @@ BOOL WINAPI LoadLPK(INT LpkFunctionID)
                     return FALSE;
                 }
 
+                return TRUE;
+
+            case LPK_INIT:
                 return TRUE;
 
             default: 
