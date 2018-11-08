@@ -32,4 +32,4 @@ if(NOT MSVC)
 endif()
 
 add_subdirectory(midimap)
-add_subdirectory(winejoystick.drv)
+add_subdirectory(joystick.drv)
