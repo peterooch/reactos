@@ -136,9 +136,6 @@ int OSK_DlgInitDialog(HWND hDlg)
                rcWindow.bottom - rcWindow.top,     // Height
                TRUE);
                
-    SetWindowLongW(hDlg, GWL_STYLE,
-                   GetWindowLong(hDlg, GWL_STYLE) & ~WS_MAXIMIZEBOX);
-
     /* Set icon on visual buttons */
     OSK_SetImage(SCAN_CODE_15, IDI_BACK);
     OSK_SetImage(SCAN_CODE_16, IDI_TAB);
