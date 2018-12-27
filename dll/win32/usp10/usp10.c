@@ -718,6 +718,7 @@ typedef struct {
     SCRIPT_LOGATTR* logattrs;
     SIZE sz;
     int* logical2visual;
+    int hotkey_pos;
 } StringAnalysis;
 
 typedef struct {
@@ -1976,6 +1977,57 @@ static void find_fallback_font(enum usp10_script scriptid, WCHAR *FaceName)
         lstrcpyW(FaceName,scriptInformation[scriptid].fallbackFont);
 }
 
+static void process_hotkey_string(const WCHAR* str, int cString, WCHAR* new_str, int* newlen, int* hotkey_pos)
+{
+    static const WCHAR ampersandW = L'&';
+    int i, copied_chars = 0;
+    int pos = -1, removed_chars = 0;
+
+    for (i = 0; i < cString; i++)
+    {
+        if (i < cString - 1 && str[i] == ampersandW)
+        {
+            if (str[i + 1] == ampersandW)
+            {
+                removed_chars++;
+                i++;
+            }
+            else
+            {
+                pos = i - removed_chars;
+                removed_chars++;
+                continue;
+            }
+        }
+        new_str[copied_chars++] = str[i];
+    }
+    *newlen = copied_chars;
+    *hotkey_pos = pos;
+}
+
+static void draw_hotkey(int x, int y, SCRIPT_STRING_ANALYSIS ssa)
+{
+    StringAnalysis *analysis = NULL;
+    int hotkey_start, hotkey_end, pos;
+    HPEN hpen, oldpen;
+
+    if (!(analysis = ssa) || analysis->hotkey_pos == -1)
+        return;
+
+    ScriptStringCPtoX(ssa, analysis->hotkey_pos, FALSE, &pos);
+    hotkey_start = x + pos;
+    ScriptStringCPtoX(ssa, analysis->hotkey_pos, TRUE, &pos);
+    hotkey_end = x + pos;
+    y += analysis->glyphs[0].sc->tm.tmAscent + 1;
+
+    hpen = CreatePen(PS_SOLID, 1, GetTextColor(analysis->hdc));
+    oldpen = SelectObject(analysis->hdc, hpen);
+    MoveToEx(analysis->hdc, hotkey_start, y, NULL);
+    LineTo(analysis->hdc, hotkey_end, y);
+    SelectObject(analysis->hdc, oldpen);
+    DeleteObject(hpen);
+}
+
 /***********************************************************************
  *      ScriptStringAnalyse (USP10.@)
  *
@@ -1991,9 +2043,9 @@ HRESULT WINAPI ScriptStringAnalyse(HDC hdc, const void *pString, int cString,
     StringAnalysis *analysis = NULL;
     SCRIPT_CONTROL sControl;
     SCRIPT_STATE sState;
-    int i, num_items = 255;
+    int i, hotkey_str_len, num_items = 255;
     BYTE   *BidiLevel;
-    WCHAR *iString = NULL;
+    WCHAR *iString = NULL, *hotkey_string = NULL;
 
     TRACE("(%p,%p,%d,%d,%d,0x%x,%d,%p,%p,%p,%p,%p,%p)\n",
           hdc, pString, cString, cGlyphs, iCharset, dwFlags, iReqWidth,
@@ -2037,6 +2089,19 @@ HRESULT WINAPI ScriptStringAnalyse(HDC hdc, const void *pString, int cString,
         for (i = 0; i < cString; i++)
             iString[i] = *((const WCHAR *)pString);
         pString = iString;
+    }
+
+    if (dwFlags & (SSA_HOTKEY | SSA_HIDEHOTKEY | SSA_HOTKEYONLY))
+    {
+        if (!(hotkey_string = heap_calloc(cString, sizeof(*hotkey_string))))
+        {
+            hr = E_OUTOFMEMORY;
+            goto error;
+        }
+        /* trim string of excess ampersands and find position of the last one */
+        process_hotkey_string(pString, cString, hotkey_string, &hotkey_str_len, &analysis->hotkey_pos);
+        pString = hotkey_string;
+        cString = analysis->clip_len = hotkey_str_len;
     }
 
     hr = ScriptItemize(pString, cString, num_items, &sControl, &sState, analysis->pItem,
@@ -2172,10 +2237,12 @@ HRESULT WINAPI ScriptStringAnalyse(HDC hdc, const void *pString, int cString,
 
     *pssa = analysis;
     heap_free(iString);
+    heap_free(hotkey_string);
     return S_OK;
 
 error:
     heap_free(iString);
+    heap_free(hotkey_string);
     heap_free(analysis->glyphs);
     heap_free(analysis->logattrs);
     heap_free(analysis->pItem);
@@ -2380,6 +2447,13 @@ HRESULT WINAPI ScriptStringOut(SCRIPT_STRING_ANALYSIS ssa,
     if (!(analysis = ssa)) return E_INVALIDARG;
     if (!(analysis->ssa_flags & SSA_GLYPHS)) return E_INVALIDARG;
 
+    /* Only the hotkey line is requested to be drawn */
+    if ((analysis->ssa_flags & SSA_HOTKEYONLY) == SSA_HOTKEYONLY)
+    {
+        draw_hotkey(iX, iY, ssa);
+        return S_OK;
+    }
+
     for (item = 0; item < analysis->numItems; item++)
     {
         hr = SS_ItemOut( ssa, iX, iY, analysis->logical2visual[item], -1, -1, uOptions, prc, FALSE, fDisabled);
@@ -2398,6 +2472,9 @@ HRESULT WINAPI ScriptStringOut(SCRIPT_STRING_ANALYSIS ssa,
                 return hr;
         }
     }
+
+    if ((analysis->ssa_flags & SSA_HOTKEY) == SSA_HOTKEY)
+        draw_hotkey(iX, iY, ssa);
 
     return S_OK;
 }
