@@ -12,6 +12,8 @@ DBG_DEFAULT_CHANNEL(UserPainting);
 BOOL UserExtTextOutW(HDC hdc, INT x, INT y, UINT flags, PRECTL lprc,
                      LPCWSTR lpString, UINT count);
 
+#define IsPwndMirrored(pwnd) (pwnd->ExStyle & WS_EX_LAYOUTRTL)
+
 /* PRIVATE FUNCTIONS **********************************************************/
 
 /**
@@ -2090,6 +2092,7 @@ UserDrawCaptionText(
    BOOL Ret = TRUE;
    ULONG fit = 0, Length;
    RECTL r = *lpRc;
+   UINT align = DT_LEFT;
 
    TRACE("UserDrawCaptionText: %wZ\n", Text);
 
@@ -2129,11 +2132,23 @@ UserDrawCaptionText(
    // Adjust for system menu.
    if (pWnd && pWnd->style & WS_SYSMENU)
    {
-      r.right -= UserGetSystemMetrics(SM_CYCAPTION) - 1;
-      if ((pWnd->style & (WS_MAXIMIZEBOX | WS_MINIMIZEBOX)) && !(pWnd->ExStyle & WS_EX_TOOLWINDOW))
+      if (IsPwndMirrored(pWnd))
       {
-         r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
-         r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
+          r.left += UserGetSystemMetrics(SM_CYCAPTION) - 1;
+          if ((pWnd->style & (WS_MAXIMIZEBOX | WS_MINIMIZEBOX)) && !(pWnd->ExStyle & WS_EX_TOOLWINDOW))
+          {
+              r.left += UserGetSystemMetrics(SM_CXSIZE) + 1;
+              r.left += UserGetSystemMetrics(SM_CXSIZE) + 1;
+          }
+      }
+      else
+      {
+          r.right -= UserGetSystemMetrics(SM_CYCAPTION) - 1;
+          if ((pWnd->style & (WS_MAXIMIZEBOX | WS_MINIMIZEBOX)) && !(pWnd->ExStyle & WS_EX_TOOLWINDOW))
+          {
+              r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
+              r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
+          }
       }
    }
 
@@ -2148,21 +2163,21 @@ UserDrawCaptionText(
 
    if (Ret)
    {  // Faster while in setup.
-      UserExtTextOutW( hDc,
-                      lpRc->left,
-                      lpRc->top + (lpRc->bottom - lpRc->top - Size.cy) / 2, // DT_SINGLELINE && DT_VCENTER
+      UserExtTextOutW(hDc,
+                      r.left,
+                      r.top + (r.bottom - r.top - Size.cy) / 2, // DT_SINGLELINE && DT_VCENTER
                       ETO_CLIPPED,
-                     (RECTL *)lpRc,
+                      &r,
                       Text->Buffer,
                       Length);
    }
    else
    {
-      DrawTextW( hDc,
-                 Text->Buffer,
-                 Text->Length/sizeof(WCHAR),
-                (RECTL *)&r,
-                 DT_END_ELLIPSIS|DT_SINGLELINE|DT_VCENTER|DT_NOPREFIX|DT_LEFT);
+      DrawTextW(hDc,
+                Text->Buffer,
+                Text->Length/sizeof(WCHAR),
+                &r,
+                DT_END_ELLIPSIS|DT_SINGLELINE|DT_VCENTER|DT_NOPREFIX|align);
    }
  
    IntGdiSetTextColor(hDc, OldTextColor);
@@ -2283,10 +2298,17 @@ BOOL UserDrawCaption(
 
       if (pIcon)
       {
-         LONG cx = UserGetSystemMetrics(SM_CXSMICON);
-         LONG cy = UserGetSystemMetrics(SM_CYSMICON);
-         LONG x = Rect.left - cx/2 + 1 + (Rect.bottom - Rect.top)/2; // this is really what Window does
-         LONG y = (Rect.top + Rect.bottom - cy)/2; // center
+         LONG cx, cy, x, y;
+
+         cx = UserGetSystemMetrics(SM_CXSMICON);
+         cy = UserGetSystemMetrics(SM_CYSMICON);
+         
+         if (IsPwndMirrored(pWnd))
+             x = Rect.right - (cx / 2 + 1 + (Rect.bottom - Rect.top) / 2) - 1;
+         else
+             x = Rect.left - cx / 2 + (Rect.bottom - Rect.top) / 2 + 1;
+
+         y = (Rect.top + Rect.bottom - cy) / 2; // center
          UserDrawIconEx(hDc, x, y, pIcon, cx, cy, 0, NULL, DI_NORMAL);
          UserDereferenceObject(pIcon);
       }
@@ -2297,12 +2319,21 @@ BOOL UserDrawCaption(
    }
 
    if (HasIcon)
-      Rect.left += Rect.bottom - Rect.top;
+   {
+       if (IsPwndMirrored(pWnd))
+           Rect.right -= Rect.bottom - Rect.top;
+       else
+           Rect.left += Rect.bottom - Rect.top;
+   }
 
    if((uFlags & DC_TEXT))
    {
       BOOL Set = FALSE;
-      Rect.left += 2;
+
+      if (IsPwndMirrored(pWnd))
+          Rect.right -= 2;
+      else
+          Rect.left += 2;
 
       if (Str)
          Set = UserDrawCaptionText(pWnd, hDc, Str, &Rect, uFlags, hFont);
