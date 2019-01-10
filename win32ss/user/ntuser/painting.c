@@ -2130,13 +2130,25 @@ UserDrawCaptionText(
                                         IntGetSysColor(uFlags & DC_ACTIVE ? COLOR_CAPTIONTEXT : COLOR_INACTIVECAPTIONTEXT));
 
    // Adjust for system menu.
-   if (pWnd && pWnd->style & WS_SYSMENU && !(IsPwndMirrored(pWnd)))
+   if (pWnd && pWnd->style & WS_SYSMENU)
    {
-      r.right -= UserGetSystemMetrics(SM_CYCAPTION) - 1;
-      if ((pWnd->style & (WS_MAXIMIZEBOX | WS_MINIMIZEBOX)) && !(pWnd->ExStyle & WS_EX_TOOLWINDOW))
+      if (IsPwndMirrored(pWnd))
       {
-         r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
-         r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
+          r.left += UserGetSystemMetrics(SM_CYCAPTION) - 1;
+          if ((pWnd->style & (WS_MAXIMIZEBOX | WS_MINIMIZEBOX)) && !(pWnd->ExStyle & WS_EX_TOOLWINDOW))
+          {
+              r.left += UserGetSystemMetrics(SM_CXSIZE) + 1;
+              r.left += UserGetSystemMetrics(SM_CXSIZE) + 1;
+          }
+      }
+      else
+      {
+          r.right -= UserGetSystemMetrics(SM_CYCAPTION) - 1;
+          if ((pWnd->style & (WS_MAXIMIZEBOX | WS_MINIMIZEBOX)) && !(pWnd->ExStyle & WS_EX_TOOLWINDOW))
+          {
+              r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
+              r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
+          }
       }
    }
 
@@ -2147,13 +2159,6 @@ UserDrawCaptionText(
    if (Text->Length/sizeof(WCHAR) > Length)
    {
       Ret = FALSE;
-   }
-
-   if (IsPwndMirrored(pWnd))
-   {
-       // Stick the text to the right
-       r.left = r.right - Size.cx;
-       align = DT_RIGHT;
    }
 
    if (Ret)

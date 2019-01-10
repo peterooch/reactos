@@ -766,10 +766,12 @@ SetTextAlign(
 
     fOldMode = pdcattr->lTextAlign;
     pdcattr->lTextAlign = fMode; // Raw
+#if 0
     if (pdcattr->dwLayout & LAYOUT_RTL)
     {
         if ((fMode & TA_CENTER) != TA_CENTER) fMode ^= TA_RIGHT;
     }
+#endif
 
     pdcattr->flTextAlign = fMode & TA_MASK;
     return fOldMode;
