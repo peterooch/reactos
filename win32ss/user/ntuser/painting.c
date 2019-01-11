@@ -2092,7 +2092,6 @@ UserDrawCaptionText(
    BOOL Ret = TRUE;
    ULONG fit = 0, Length;
    RECTL r = *lpRc;
-   UINT align = DT_LEFT;
 
    TRACE("UserDrawCaptionText: %wZ\n", Text);
 
@@ -2132,12 +2131,12 @@ UserDrawCaptionText(
    // Adjust for system menu.
    if (pWnd && pWnd->style & WS_SYSMENU)
    {
-       r.right -= UserGetSystemMetrics(SM_CYCAPTION) - 1;
-       if ((pWnd->style & (WS_MAXIMIZEBOX | WS_MINIMIZEBOX)) && !(pWnd->ExStyle & WS_EX_TOOLWINDOW))
-       {
-           r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
-           r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
-       }
+      r.right -= UserGetSystemMetrics(SM_CYCAPTION) - 1;
+      if ((pWnd->style & (WS_MAXIMIZEBOX | WS_MINIMIZEBOX)) && !(pWnd->ExStyle & WS_EX_TOOLWINDOW))
+      {
+         r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
+         r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
+      }
    }
 
    GreGetTextExtentExW(hDc, Text->Buffer, Text->Length/sizeof(WCHAR), r.right - r.left, &fit, 0, &Size, 0);
@@ -2152,8 +2151,8 @@ UserDrawCaptionText(
    if (Ret)
    {  // Faster while in setup.
       UserExtTextOutW(hDc,
-                      r.left,
-                      r.top + (r.bottom - r.top - Size.cy) / 2, // DT_SINGLELINE && DT_VCENTER
+                      lpRc->left,
+                      lpRc->top + (lpRc->bottom - lpRc->top - Size.cy) / 2, // DT_SINGLELINE && DT_VCENTER
                       ETO_CLIPPED,
                       &r,
                       Text->Buffer,
@@ -2165,7 +2164,7 @@ UserDrawCaptionText(
                 Text->Buffer,
                 Text->Length/sizeof(WCHAR),
                 &r,
-                DT_END_ELLIPSIS|DT_SINGLELINE|DT_VCENTER|DT_NOPREFIX|align);
+                DT_END_ELLIPSIS|DT_SINGLELINE|DT_VCENTER|DT_NOPREFIX);
    }
  
    IntGdiSetTextColor(hDc, OldTextColor);
@@ -2307,12 +2306,11 @@ BOOL UserDrawCaption(
    }
 
    if (HasIcon)
-       Rect.left += Rect.bottom - Rect.top;
+      Rect.left += Rect.bottom - Rect.top;
 
    if((uFlags & DC_TEXT))
    {
       BOOL Set = FALSE;
-
       Rect.left += 2;
 
       if (Str)

@@ -5860,20 +5860,21 @@ GreExtTextOutW(
         /*All these bit shifts are nauseating*/
         if (pdcattr->dwLayout & LAYOUT_RTL)
         {
-            DPRINT1("RealXStart %lld, TextWidth %lld, dc->ptlDCOrig.x %d, dc->erclWindow.left %d, dc->erclWindow.right %d, dc->erclWindow.right << 6 %d\n",
-                    RealXStart64, TextWidth64, dc->ptlDCOrig.x, dc->erclWindow.left, dc->erclWindow.right, dc->erclWindow.right << 6);
-
             /* Go forward to the right edge of the dc, then go backwards to the mirrored x position
                and then go further backwards to the real x position */
-            RealXStart64 = ((dc->ptlDCOrig.x + DCWidth) << 6) - RealXStart64 - TextWidth64;
+            RealXStart64 = ((dc->ptlDCOrig.x + DCWidth) << 6) - (RealXStart64 - (dc->ptlDCOrig.x << 6)) - TextWidth64;
+#if 0
+            if (((RealXStart64 + TextWidth64 + 32) >> 6) >= dc->ptlDCOrig.x + (DCWidth - Start.x))
+                RealXStart64 -= 1 << 6;
+#endif
         }
         else
         {
             RealXStart64 -= TextWidth64;
-        }
 
-        if (((RealXStart64 + TextWidth64 + 32) >> 6) <= Start.x + dc->ptlDCOrig.x)
-            RealXStart64 += 1 << 6;
+            if (((RealXStart64 + TextWidth64 + 32) >> 6) <= Start.x + dc->ptlDCOrig.x)
+                RealXStart64 += 1 << 6;
+        }
     }
 
     psurf = dc->dclevel.pSurface;
