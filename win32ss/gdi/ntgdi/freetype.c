@@ -5559,7 +5559,7 @@ GreExtTextOutW(
     FT_Matrix mat1, mat2 = identityMat;
     FT_Vector vecs[9];
     POINT pts[9];
-    LONG lTextAlign;
+    LONG lTextAlign, DCWidth, Width;
 
     /* Check if String is valid */
     if ((Count > 0xFFFF) || (Count > 0 && String == NULL))
@@ -5606,10 +5606,26 @@ GreExtTextOutW(
 
     pdcattr = dc->pdcattr;
     lTextAlign = pdcattr->lTextAlign;
+    DCWidth = dc->erclWindow.right - dc->erclWindow.left;
 
     if (lprc && (fuOptions & (ETO_OPAQUE | ETO_CLIPPED)))
     {
         IntLPtoDP(dc, (POINT *)lprc, 2);
+    }
+
+    if (pdcattr->dwLayout & LAYOUT_RTL)
+    {
+        /* Wine does this */
+        if ((lTextAlign & TA_CENTER) != TA_CENTER)
+            lTextAlign ^= TA_RIGHT;
+
+        /* Reposition rect */
+        if (lprc)
+        {
+            Width = (lprc->right - lprc->left);
+            lprc->right = DCWidth - lprc->left;
+            lprc->left = lprc->right - Width;
+        }
     }
 
     if (lTextAlign & TA_UPDATECP)
@@ -5619,13 +5635,6 @@ GreExtTextOutW(
     } else {
         Start.x = XStart;
         Start.y = YStart;
-    }
-
-    if (pdcattr->dwLayout & LAYOUT_RTL)
-    {
-        /* Wine does this */
-        if ((lTextAlign & TA_CENTER) != TA_CENTER)
-            lTextAlign ^= TA_RIGHT;
     }
 
     IntLPtoDP(dc, &Start, 1);
@@ -5860,7 +5869,7 @@ GreExtTextOutW(
 
             /* Go forward to the right edge of the dc, then go backwards to the mirrored x position
                and then go further backwards to the real x position */
-            RealXStart64 = ((dc->erclWindow.right << 6) - RealXStart64 - TextWidth64);
+            RealXStart64 = ((dc->ptlDCOrig.x + DCWidth) << 6) - RealXStart64 - TextWidth64;
         }
         else
         {
