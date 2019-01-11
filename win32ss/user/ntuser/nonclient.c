@@ -37,14 +37,6 @@ DBG_DEFAULT_CHANNEL(UserDefwnd);
              (WindowRect.right - WindowRect.left == ParentClientRect.right) && \
              (WindowRect.bottom - WindowRect.top == ParentClientRect.bottom)))
 
-FORCEINLINE VOID mirror_rect(const RECT *window_rect, LPRECT rect)
-{
-    int width = window_rect->right - window_rect->left;
-    int tmp = rect->left;
-    rect->left = width - rect->right;              
-    rect->right = width - tmp;
-}
-
 VOID FASTCALL
 UserDrawWindowFrame(HDC hdc,
                     RECTL *rect,
@@ -716,9 +708,6 @@ UserDrawCaptionButton(PWND pWnd, LPRECT Rect, DWORD Style, DWORD ExStyle, HDC hD
          TempRect.top += 2;
          TempRect.right -= 1;
 
-         if (ExStyle & WS_EX_LAYOUTRTL)
-            mirror_rect(Rect, &TempRect);
-
          DrawFrameControl(hDC, &TempRect, DFC_CAPTION,
                           ((Style & WS_MINIMIZE) ? DFCS_CAPTIONRESTORE : DFCS_CAPTIONMIN) |
                           (bDown ? DFCS_PUSHED : 0) |
@@ -737,9 +726,6 @@ UserDrawCaptionButton(PWND pWnd, LPRECT Rect, DWORD Style, DWORD ExStyle, HDC hD
          TempRect.bottom = TempRect.top + UserGetSystemMetrics(SM_CYSIZE) - 2;
          TempRect.top += 2;
          TempRect.right -= 1;
-
-         if (ExStyle & WS_EX_LAYOUTRTL)
-             mirror_rect(Rect, &TempRect);
 
          DrawFrameControl(hDC, &TempRect, DFC_CAPTION,
                           ((Style & WS_MAXIMIZE) ? DFCS_CAPTIONRESTORE : DFCS_CAPTIONMAX) |
@@ -765,21 +751,6 @@ UserDrawCaptionButton(PWND pWnd, LPRECT Rect, DWORD Style, DWORD ExStyle, HDC hD
          }
          TempRect.top += 2;
          TempRect.right -= 2;
-#if 0
-         if (ExStyle & WS_EX_LAYOUTRTL)
-         {
-             RECT MirroredRect;
-
-             MirroredRect.top = TempRect.top;
-             MirroredRect.bottom = TempRect.bottom;
-             MirroredRect.right = (Rect->right - TempRect.left);
-             MirroredRect.left = MirroredRect.right - (TempRect.right - TempRect.right);
-             TempRect = MirroredRect;
-         }
-#endif
-         if (ExStyle & WS_EX_LAYOUTRTL)
-             mirror_rect(Rect, &TempRect);
-
 
          DrawFrameControl(hDC, &TempRect, DFC_CAPTION,
                           (DFCS_CAPTIONCLOSE | (bDown ? DFCS_PUSHED : 0) |

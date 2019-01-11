@@ -138,3 +138,15 @@ HBITMAP NTAPI UserLoadImage(PCWSTR);
 
 BOOL NTAPI W32kDosPathNameToNtPathName(PCWSTR, PUNICODE_STRING);
 
+FORCEINLINE
+VOID
+MirrorRect(const RECTL *DCRect, PRECTL blitRect)
+{
+    LONG DCWidth, RectWidth;
+
+    DCWidth = DCRect->right - DCRect->left;
+    RectWidth = blitRect->right - blitRect->left;
+    blitRect->right = DCWidth - blitRect->left;
+    blitRect->left = blitRect->right - RectWidth;
+}
+

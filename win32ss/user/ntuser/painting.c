@@ -2132,24 +2132,12 @@ UserDrawCaptionText(
    // Adjust for system menu.
    if (pWnd && pWnd->style & WS_SYSMENU)
    {
-      if (IsPwndMirrored(pWnd))
-      {
-          r.left += UserGetSystemMetrics(SM_CYCAPTION) - 1;
-          if ((pWnd->style & (WS_MAXIMIZEBOX | WS_MINIMIZEBOX)) && !(pWnd->ExStyle & WS_EX_TOOLWINDOW))
-          {
-              r.left += UserGetSystemMetrics(SM_CXSIZE) + 1;
-              r.left += UserGetSystemMetrics(SM_CXSIZE) + 1;
-          }
-      }
-      else
-      {
-          r.right -= UserGetSystemMetrics(SM_CYCAPTION) - 1;
-          if ((pWnd->style & (WS_MAXIMIZEBOX | WS_MINIMIZEBOX)) && !(pWnd->ExStyle & WS_EX_TOOLWINDOW))
-          {
-              r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
-              r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
-          }
-      }
+       r.right -= UserGetSystemMetrics(SM_CYCAPTION) - 1;
+       if ((pWnd->style & (WS_MAXIMIZEBOX | WS_MINIMIZEBOX)) && !(pWnd->ExStyle & WS_EX_TOOLWINDOW))
+       {
+           r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
+           r.right -= UserGetSystemMetrics(SM_CXSIZE) + 1;
+       }
    }
 
    GreGetTextExtentExW(hDc, Text->Buffer, Text->Length/sizeof(WCHAR), r.right - r.left, &fit, 0, &Size, 0);
@@ -2319,21 +2307,13 @@ BOOL UserDrawCaption(
    }
 
    if (HasIcon)
-   {
-       if (IsPwndMirrored(pWnd))
-           Rect.right -= Rect.bottom - Rect.top;
-       else
-           Rect.left += Rect.bottom - Rect.top;
-   }
+       Rect.left += Rect.bottom - Rect.top;
 
    if((uFlags & DC_TEXT))
    {
       BOOL Set = FALSE;
 
-      if (IsPwndMirrored(pWnd))
-          Rect.right -= 2;
-      else
-          Rect.left += 2;
+      Rect.left += 2;
 
       if (Str)
          Set = UserDrawCaptionText(pWnd, hDc, Str, &Rect, uFlags, hFont);
