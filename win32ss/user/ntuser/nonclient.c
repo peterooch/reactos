@@ -37,6 +37,7 @@ DBG_DEFAULT_CHANNEL(UserDefwnd);
              (WindowRect.right - WindowRect.left == ParentClientRect.right) && \
              (WindowRect.bottom - WindowRect.top == ParentClientRect.bottom)))
 
+
 VOID FASTCALL
 UserDrawWindowFrame(HDC hdc,
                     RECTL *rect,
