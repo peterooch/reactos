@@ -140,13 +140,14 @@ BOOL NTAPI W32kDosPathNameToNtPathName(PCWSTR, PUNICODE_STRING);
 
 FORCEINLINE
 VOID
-MirrorRect(const RECTL *DCRect, PRECTL blitRect)
+MirrorRect(const RECTL *ParentRect, PRECTL ChiledRect)
 {
-    LONG DCWidth, RectWidth;
+    LONG ParentWidth, ChildWidth;
 
-    DCWidth = DCRect->right - DCRect->left;
-    RectWidth = blitRect->right - blitRect->left;
-    blitRect->right = DCWidth - blitRect->left;
-    blitRect->left = blitRect->right - RectWidth;
+    ParentWidth = ParentRect->right - ParentRect->left;
+    ChildWidth = ChiledRect->right - ChiledRect->left;
+    ChiledRect->right = ParentWidth - ChiledRect->left;
+    ChiledRect->left = ChiledRect->right - ChildWidth;
 }
 
+#define GetPDCWidth(pdc) (pdc->erclWindow.right - pdc->erclWindow.left)

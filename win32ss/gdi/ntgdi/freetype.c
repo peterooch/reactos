@@ -5606,7 +5606,7 @@ GreExtTextOutW(
 
     pdcattr = dc->pdcattr;
     lTextAlign = pdcattr->lTextAlign;
-    DCWidth = (dc->erclWindow.right - dc->erclWindow.left);
+    DCWidth = GetPDCWidth(dc);
 
     if (lprc && (fuOptions & (ETO_OPAQUE | ETO_CLIPPED)))
     {
