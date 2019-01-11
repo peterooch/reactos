@@ -5851,18 +5851,20 @@ GreExtTextOutW(
     }
     else if ((lTextAlign & TA_RIGHT) == TA_RIGHT)
     {
+        RECT wndrect = dc->erclWindow;
+
+        IntLPtoDP(dc, (POINT *)&wndrect, 2);
+
         if (pdcattr->dwLayout & LAYOUT_RTL)
-        {
-            if (fuOptions & ETO_CLIPPED && lprc)
-                RealXStart64 += (lprc->right + dc->ptlDCOrig.x) + TextWidth64;
-            else
-                RealXStart64 += dc->erclWindow.right + TextWidth64;
-        }
+            RealXStart64 = -(wndrect.right - RealXStart64 - TextWidth64);
         else
             RealXStart64 -= TextWidth64;
 
         if (pdcattr->dwLayout & LAYOUT_RTL)
-            DPRINT1("RealX position is %lld, width %lld\n", RealXStart64, TextWidth64);
+        {
+            DPRINT1("RealXStart  %lld, TextWidth64 %lld, dc->ptlDCOrig.x %d\
+                    dc->erclWindow.left %d, dc->erclWindow.right %d\n", RealXStart64, TextWidth64, dc->ptlDCOrig.x, wndrect.left, wndrect.right);
+        }
 
         if (((RealXStart64 + TextWidth64 + 32) >> 6) <= Start.x + dc->ptlDCOrig.x)
             RealXStart64 += 1 << 6;
