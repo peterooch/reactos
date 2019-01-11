@@ -5559,7 +5559,7 @@ GreExtTextOutW(
     FT_Matrix mat1, mat2 = identityMat;
     FT_Vector vecs[9];
     POINT pts[9];
-    LONG lTextAlign, DCWidth, Width;
+    LONG lTextAlign, DCWidth;
 
     /* Check if String is valid */
     if ((Count > 0xFFFF) || (Count > 0 && String == NULL))
@@ -5606,7 +5606,7 @@ GreExtTextOutW(
 
     pdcattr = dc->pdcattr;
     lTextAlign = pdcattr->lTextAlign;
-    DCWidth = dc->erclWindow.right - dc->erclWindow.left;
+    DCWidth = (dc->erclWindow.right - dc->erclWindow.left);
 
     if (lprc && (fuOptions & (ETO_OPAQUE | ETO_CLIPPED)))
     {
@@ -5621,11 +5621,7 @@ GreExtTextOutW(
 
         /* Reposition rect */
         if (lprc)
-        {
-            Width = (lprc->right - lprc->left);
-            lprc->right = DCWidth - lprc->left;
-            lprc->left = lprc->right - Width;
-        }
+            MirrorRect(&dc->erclWindow, lprc);
     }
 
     if (lTextAlign & TA_UPDATECP)

@@ -177,6 +177,12 @@ IntGdiLineTo(DC  *dc,
 
         IntLPtoDP(dc, Points, 2);
 
+        if (dc->pdcattr->dwLayout & LAYOUT_RTL)
+        {
+            Points[0].x = (dc->erclWindow.right - dc->erclWindow.left) - pdcattr->ptlCurrent.x;
+            Points[1].x = (dc->erclWindow.right - dc->erclWindow.left) - XEnd;
+        }
+
         /* The DCOrg is in device coordinates */
         Points[0].x += dc->ptlDCOrig.x;
         Points[0].y += dc->ptlDCOrig.y;
@@ -447,6 +453,9 @@ NtGdiLineTo(HDC  hDC,
     rcLockRect.bottom = YEnd;
 
     IntLPtoDP(dc, &rcLockRect, 2);
+
+    if (dc->pdcattr->dwLayout & LAYOUT_RTL)
+        MirrorRect(&dc->erclWindow, &rcLockRect);
 
     /* The DCOrg is in device coordinates */
     rcLockRect.left += dc->ptlDCOrig.x;
