@@ -788,6 +788,7 @@ IntPatBlt(
     POINTL BrushOrigin;
     BOOL ret;
     PBRUSH pbrush;
+    LONG DCWidth, RectWidth;
 
     ASSERT(pebo);
     pbrush = pebo->pbrush;
@@ -821,6 +822,14 @@ IntPatBlt(
     }
 
     IntLPtoDP(pdc, (LPPOINT)&DestRect, 2);
+
+    if (pdc->pdcattr->dwLayout & LAYOUT_RTL)
+    {
+        DCWidth   = pdc->erclWindow.right - pdc->erclWindow.left;
+        RectWidth = DestRect.right - DestRect.left;
+        DestRect.right = DCWidth - DestRect.left;
+        DestRect.left = DestRect.right - RectWidth;
+    }
 
     DestRect.left   += pdc->ptlDCOrig.x;
     DestRect.top    += pdc->ptlDCOrig.y;
