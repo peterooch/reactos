@@ -5623,6 +5623,7 @@ GreExtTextOutW(
 
     if (pdcattr->dwLayout & LAYOUT_RTL)
     {
+        /* Wine does this */
         if ((lTextAlign & TA_CENTER) != TA_CENTER)
             lTextAlign ^= TA_RIGHT;
     }
@@ -5851,19 +5852,19 @@ GreExtTextOutW(
     }
     else if ((lTextAlign & TA_RIGHT) == TA_RIGHT)
     {
-        RECT wndrect = dc->erclWindow;
-
-        IntLPtoDP(dc, (POINT *)&wndrect, 2);
-
-        if (pdcattr->dwLayout & LAYOUT_RTL)
-            RealXStart64 = -(wndrect.right - RealXStart64 - TextWidth64);
-        else
-            RealXStart64 -= TextWidth64;
-
+        /*All these bit shifts are nauseating*/
         if (pdcattr->dwLayout & LAYOUT_RTL)
         {
-            DPRINT1("RealXStart  %lld, TextWidth64 %lld, dc->ptlDCOrig.x %d\
-                    dc->erclWindow.left %d, dc->erclWindow.right %d\n", RealXStart64, TextWidth64, dc->ptlDCOrig.x, wndrect.left, wndrect.right);
+            DPRINT1("RealXStart %lld, TextWidth %lld, dc->ptlDCOrig.x %d, dc->erclWindow.left %d, dc->erclWindow.right %d, dc->erclWindow.right << 6 %d\n",
+                    RealXStart64, TextWidth64, dc->ptlDCOrig.x, dc->erclWindow.left, dc->erclWindow.right, dc->erclWindow.right << 6);
+
+            /* Go forward to the right edge of the dc, then go backwards to the mirrored x position
+               and then go further backwards to the real x position */
+            RealXStart64 = ((dc->erclWindow.right << 6) - RealXStart64 - TextWidth64);
+        }
+        else
+        {
+            RealXStart64 -= TextWidth64;
         }
 
         if (((RealXStart64 + TextWidth64 + 32) >> 6) <= Start.x + dc->ptlDCOrig.x)
