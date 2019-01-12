@@ -53,6 +53,9 @@ IntGdiPolygon(PDC    dc,
     IntLPtoDP(dc, Points, Count);
     for (CurrentPoint = 0; CurrentPoint < Count; CurrentPoint++)
     {
+        if (pdcattr->dwLayout & LAYOUT_RTL)
+            Points[CurrentPoint].x = GetPDCWidth(dc) - Points[CurrentPoint].x;
+
         Points[CurrentPoint].x += dc->ptlDCOrig.x;
         Points[CurrentPoint].y += dc->ptlDCOrig.y;
     }
@@ -286,6 +289,9 @@ NtGdiEllipse(
     RectBounds.bottom = Bottom;
 
     IntLPtoDP(dc, (LPPOINT)&RectBounds, 2);
+
+    if (pdcattr->dwLayout & LAYOUT_RTL)
+        MirrorRect(&dc->erclWindow, &RectBounds);
 
     RectBounds.left += dc->ptlDCOrig.x;
     RectBounds.right += dc->ptlDCOrig.x;
@@ -561,6 +567,9 @@ IntRectangle(PDC dc,
 
     IntLPtoDP(dc, (LPPOINT)&DestRect, 2);
 
+    if (pdcattr->dwLayout & LAYOUT_RTL)
+        MirrorRect(&dc->erclWindow, &DestRect);
+
     DestRect.left   += dc->ptlDCOrig.x;
     DestRect.right  += dc->ptlDCOrig.x;
     DestRect.top    += dc->ptlDCOrig.y;
@@ -786,6 +795,9 @@ IntRoundRect(
 
     IntLPtoDP(dc, (LPPOINT)&RectBounds, 2);
 
+    if (pdcattr->dwLayout & LAYOUT_RTL)
+        MirrorRect(&dc->erclWindow, &RectBounds);
+
     RectBounds.left   += dc->ptlDCOrig.x;
     RectBounds.top    += dc->ptlDCOrig.y;
     RectBounds.right  += dc->ptlDCOrig.x;
@@ -939,6 +951,9 @@ GreGradientFill(
         rclExtent.bottom = max(rclExtent.bottom, (pVertex + i)->y);
     }
     IntLPtoDP(pdc, (LPPOINT)&rclExtent, 2);
+
+    if (pdc->pdcattr->dwLayout & LAYOUT_RTL)
+        MirrorRect(&pdc->erclWindow, &rclExtent);
 
     rclExtent.left   += pdc->ptlDCOrig.x;
     rclExtent.right  += pdc->ptlDCOrig.x;
@@ -1122,6 +1137,9 @@ NtGdiExtFloodFill(
     {
         RECTL_vSetRect(&DestRect, 0, 0, psurf->SurfObj.sizlBitmap.cx, psurf->SurfObj.sizlBitmap.cy);
     }
+
+    if (dc->pdcattr->dwLayout & LAYOUT_RTL)
+        MirrorRect(&dc->erclWindow, &DestRect);
 
     if (dc->fs & (DC_ACCUM_APP|DC_ACCUM_WMGR))
     {
