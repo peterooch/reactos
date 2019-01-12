@@ -12,8 +12,6 @@ DBG_DEFAULT_CHANNEL(UserPainting);
 BOOL UserExtTextOutW(HDC hdc, INT x, INT y, UINT flags, PRECTL lprc,
                      LPCWSTR lpString, UINT count);
 
-#define IsPwndMirrored(pwnd) (pwnd->ExStyle & WS_EX_LAYOUTRTL)
-
 /* PRIVATE FUNCTIONS **********************************************************/
 
 /**
