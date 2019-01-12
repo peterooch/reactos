@@ -138,15 +138,20 @@ HBITMAP NTAPI UserLoadImage(PCWSTR);
 
 BOOL NTAPI W32kDosPathNameToNtPathName(PCWSTR, PUNICODE_STRING);
 
+/*Mirroring helpers*/
+
+#define GetPDCWidth(pdc) (pdc->erclWindow.right - pdc->erclWindow.left)
+#define GetPRECTWidth(prect) (prect->right - prect->left)
+#define GetRECTWidth(rect) (rect.right - rect.left)
+
 FORCEINLINE
 VOID
-MirrorRect(const RECTL *DCRect, PRECTL blitRect)
+MirrorRect(const RECTL *ParentRect, PRECTL ChildRect)
 {
-    LONG DCWidth, RectWidth;
+    LONG ParentWidth, ChildWidth;
 
-    DCWidth = DCRect->right - DCRect->left;
-    RectWidth = blitRect->right - blitRect->left;
-    blitRect->right = DCWidth - blitRect->left;
-    blitRect->left = blitRect->right - RectWidth;
+    ParentWidth = GetPRECTWidth(ParentRect);
+    ChildWidth = GetPRECTWidth(ChildRect);
+    ChildRect->right = ParentWidth - ChildRect->left;
+    ChildRect->left = ChildRect->right - ChildWidth;
 }
-

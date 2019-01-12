@@ -179,8 +179,8 @@ IntGdiLineTo(DC  *dc,
 
         if (dc->pdcattr->dwLayout & LAYOUT_RTL)
         {
-            Points[0].x = (dc->erclWindow.right - dc->erclWindow.left) - pdcattr->ptlCurrent.x;
-            Points[1].x = (dc->erclWindow.right - dc->erclWindow.left) - XEnd;
+            Points[0].x = GetPDCWidth(dc) - pdcattr->ptlCurrent.x;
+            Points[1].x = GetPDCWidth(dc) - XEnd;
         }
 
         /* The DCOrg is in device coordinates */
