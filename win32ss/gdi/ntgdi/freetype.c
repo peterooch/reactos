@@ -5864,7 +5864,7 @@ GreExtTextOutW(
                and then go further backwards to the real x position */
             RealXStart64 = ((dc->ptlDCOrig.x + DCWidth) << 6) - (RealXStart64 - (dc->ptlDCOrig.x << 6)) - TextWidth64;
 
-            /* Haxx */
+            /* Haxx, makes buttons somewhat viewable */
             if ((fuOptions & ETO_CLIPPED && lprc) &&
                 ((RealXStart64 + TextWidth64 + 32) >> 6) >= dc->ptlDCOrig.x + lprc->right)
             {
