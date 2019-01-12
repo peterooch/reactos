@@ -143,6 +143,7 @@ BOOL NTAPI W32kDosPathNameToNtPathName(PCWSTR, PUNICODE_STRING);
 #define GetPDCWidth(pdc) (pdc->erclWindow.right - pdc->erclWindow.left)
 #define GetPRECTWidth(prect) (prect->right - prect->left)
 #define GetRECTWidth(rect) (rect.right - rect.left)
+#define IsPwndMirrored(pwnd) (pwnd->ExStyle & WS_EX_LAYOUTRTL)
 
 FORCEINLINE
 VOID
