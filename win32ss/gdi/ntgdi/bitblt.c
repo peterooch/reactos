@@ -457,7 +457,11 @@ NtGdiMaskBlt(
     {
         IntLPtoDP(DCSrc, (LPPOINT)&SourcePoint, 1);
 
-        SourcePoint.x += DCSrc->ptlDCOrig.x;
+        if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL)
+            SourcePoint.x = GetPDCWidth(DCSrc) + DCSrc->ptlDCOrig.x - SourcePoint.x;
+        else
+            SourcePoint.x += DCSrc->ptlDCOrig.x;
+
         SourcePoint.y += DCSrc->ptlDCOrig.y;
         /* Calculate Source Rect */
         SourceRect.left = SourcePoint.x;
@@ -660,14 +664,13 @@ GreStretchBltMask(
     SourceRect.top    = YOriginSrc;
     SourceRect.right  = XOriginSrc+WidthSrc;
     SourceRect.bottom = YOriginSrc+HeightSrc;
+    IntLPtoDP(DCSrc, (LPPOINT)&SourceRect, 2);
 
     if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL)
-        MirrorRect(&DCDest->erclWindow, &DestRect);
+        MirrorRect(&DCDest->erclWindow, &SourceRect);
 
     if (UsesSource)
     {
-        IntLPtoDP(DCSrc, (LPPOINT)&SourceRect, 2);
-
         SourceRect.left   += DCSrc->ptlDCOrig.x;
         SourceRect.top    += DCSrc->ptlDCOrig.y;
         SourceRect.right  += DCSrc->ptlDCOrig.x;

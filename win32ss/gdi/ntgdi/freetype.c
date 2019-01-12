@@ -5863,10 +5863,17 @@ GreExtTextOutW(
             /* Go forward to the right edge of the dc, then go backwards to the mirrored x position
                and then go further backwards to the real x position */
             RealXStart64 = ((dc->ptlDCOrig.x + DCWidth) << 6) - (RealXStart64 - (dc->ptlDCOrig.x << 6)) - TextWidth64;
-#if 0
-            if (((RealXStart64 + TextWidth64 + 32) >> 6) >= dc->ptlDCOrig.x + (DCWidth - Start.x))
-                RealXStart64 -= 1 << 6;
-#endif
+
+            /* Haxx */
+            if ((fuOptions & ETO_CLIPPED && lprc) &&
+                ((RealXStart64 + TextWidth64 + 32) >> 6) >= dc->ptlDCOrig.x + lprc->right)
+            {
+                RealXStart64 = ((dc->ptlDCOrig.x + lprc->right) << 6) - TextWidth64;
+            }
+            else if (((RealXStart64 + TextWidth64 + 32) >> 6) >= dc->ptlDCOrig.x + DCWidth)
+            {
+                RealXStart64 = ((dc->ptlDCOrig.x + DCWidth) << 6) - TextWidth64;
+            }
         }
         else
         {
