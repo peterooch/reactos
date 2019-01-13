@@ -6,6 +6,7 @@
  * PROGRAMER:        Unknown
  */
 
+#define MIRROR_SOURCE
 #include <win32k.h>
 DBG_DEFAULT_CHANNEL(GdiBlt);
 
@@ -73,7 +74,7 @@ NtGdiAlphaBlend(
     DestRect.bottom = YOriginDest + HeightDest;
     IntLPtoDP(DCDest, (LPPOINT)&DestRect, 2);
 
-    if (DCDest->pdcattr->dwLayout & LAYOUT_RTL)
+    if (DCDest->pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
         MirrorRect(&DCDest->erclWindow, &DestRect);
 
     DestRect.left   += DCDest->ptlDCOrig.x;
@@ -92,8 +93,10 @@ NtGdiAlphaBlend(
     SourceRect.bottom = YOriginSrc + HeightSrc;
     IntLPtoDP(DCSrc, (LPPOINT)&SourceRect, 2);
 
-    if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL)
+#ifdef MIRROR_SOURCE 
+    if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
         MirrorRect(&DCSrc->erclWindow, &SourceRect);
+#endif
 
     SourceRect.left   += DCSrc->ptlDCOrig.x;
     SourceRect.top    += DCSrc->ptlDCOrig.y;
@@ -257,7 +260,7 @@ NtGdiTransparentBlt(
     rcDest.bottom = rcDest.top + cyDst;
     IntLPtoDP(DCDest, (LPPOINT)&rcDest, 2);
 
-    if (DCDest->pdcattr->dwLayout & LAYOUT_RTL)
+    if (DCDest->pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
         MirrorRect(&DCDest->erclWindow, &rcDest);
 
     rcDest.left   += DCDest->ptlDCOrig.x;
@@ -271,8 +274,10 @@ NtGdiTransparentBlt(
     rcSrc.bottom = rcSrc.top + cySrc;
     IntLPtoDP(DCSrc, (LPPOINT)&rcSrc, 2);
 
-    if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL)
+#ifdef MIRROR_SOURCE
+    if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
         MirrorRect(&DCSrc->erclWindow, &rcSrc);
+#endif
 
     rcSrc.left   += DCSrc->ptlDCOrig.x;
     rcSrc.top    += DCSrc->ptlDCOrig.y;
@@ -456,10 +461,11 @@ NtGdiMaskBlt(
     if (UsesSource)
     {
         IntLPtoDP(DCSrc, (LPPOINT)&SourcePoint, 1);
-
+#if 0
         if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL)
             SourcePoint.x = GetPDCWidth(DCSrc) + DCSrc->ptlDCOrig.x - SourcePoint.x;
         else
+#endif
             SourcePoint.x += DCSrc->ptlDCOrig.x;
 
         SourcePoint.y += DCSrc->ptlDCOrig.y;
@@ -647,7 +653,7 @@ GreStretchBltMask(
     DestRect.bottom = YOriginDest+HeightDest;
     IntLPtoDP(DCDest, (LPPOINT)&DestRect, 2);
 
-    if (pdcattr->dwLayout & LAYOUT_RTL)
+    if (pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
         MirrorRect(&DCDest->erclWindow, &DestRect);
 
     DestRect.left   += DCDest->ptlDCOrig.x;
@@ -666,8 +672,10 @@ GreStretchBltMask(
     SourceRect.bottom = YOriginSrc+HeightSrc;
     IntLPtoDP(DCSrc, (LPPOINT)&SourceRect, 2);
 
-    if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL)
+#ifdef MIRROR_SOURCE
+    if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
         MirrorRect(&DCDest->erclWindow, &SourceRect);
+#endif
 
     if (UsesSource)
     {

@@ -156,3 +156,6 @@ MirrorRect(const RECTL *ParentRect, PRECTL ChildRect)
     ChildRect->right = ParentWidth - ChildRect->left;
     ChildRect->left = ChildRect->right - ChildWidth;
 }
+
+#define FixRectPosition(pdc, prect) if(pdc->pdcattr->dwLayout & LAYOUT_RTL) \
+                                        MirrorRect(&pdc->erclWindow, prect);
