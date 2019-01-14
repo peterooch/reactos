@@ -2152,7 +2152,7 @@ UserDrawCaptionText(
                       lpRc->left,
                       lpRc->top + (lpRc->bottom - lpRc->top - Size.cy) / 2, // DT_SINGLELINE && DT_VCENTER
                       ETO_CLIPPED,
-                      &r,
+                      (PRECTL)lpRc,
                       Text->Buffer,
                       Length);
    }

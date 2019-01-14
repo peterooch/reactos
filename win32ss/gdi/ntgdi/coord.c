@@ -1091,8 +1091,6 @@ DC_vSetLayout(
     //else
     //    pdcattr->ptlWindowOrg.x = wox - pdcattr->ptlWindowOrg.x;
 
-    //if (!(pdcattr->flTextAlign & TA_CENTER)) pdcattr->flTextAlign |= TA_RIGHT;
-
     if (pdc->dclevel.flPath & DCPATH_CLOCKWISE)
         pdc->dclevel.flPath &= ~DCPATH_CLOCKWISE;
     else

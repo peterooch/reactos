@@ -6,7 +6,6 @@
  * PROGRAMER:        Unknown
  */
 
-#define MIRROR_SOURCE
 #include <win32k.h>
 DBG_DEFAULT_CHANNEL(GdiBlt);
 
@@ -93,10 +92,8 @@ NtGdiAlphaBlend(
     SourceRect.bottom = YOriginSrc + HeightSrc;
     IntLPtoDP(DCSrc, (LPPOINT)&SourceRect, 2);
 
-#ifdef MIRROR_SOURCE 
     if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
         MirrorRect(&DCSrc->erclWindow, &SourceRect);
-#endif
 
     SourceRect.left   += DCSrc->ptlDCOrig.x;
     SourceRect.top    += DCSrc->ptlDCOrig.y;
@@ -274,10 +271,8 @@ NtGdiTransparentBlt(
     rcSrc.bottom = rcSrc.top + cySrc;
     IntLPtoDP(DCSrc, (LPPOINT)&rcSrc, 2);
 
-#ifdef MIRROR_SOURCE
     if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
         MirrorRect(&DCSrc->erclWindow, &rcSrc);
-#endif
 
     rcSrc.left   += DCSrc->ptlDCOrig.x;
     rcSrc.top    += DCSrc->ptlDCOrig.y;
@@ -461,13 +456,8 @@ NtGdiMaskBlt(
     if (UsesSource)
     {
         IntLPtoDP(DCSrc, (LPPOINT)&SourcePoint, 1);
-#if 0
-        if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL)
-            SourcePoint.x = GetPDCWidth(DCSrc) + DCSrc->ptlDCOrig.x - SourcePoint.x;
-        else
-#endif
-            SourcePoint.x += DCSrc->ptlDCOrig.x;
 
+        SourcePoint.x += DCSrc->ptlDCOrig.x;
         SourcePoint.y += DCSrc->ptlDCOrig.y;
         /* Calculate Source Rect */
         SourceRect.left = SourcePoint.x;
@@ -672,10 +662,8 @@ GreStretchBltMask(
     SourceRect.bottom = YOriginSrc+HeightSrc;
     IntLPtoDP(DCSrc, (LPPOINT)&SourceRect, 2);
 
-#ifdef MIRROR_SOURCE
     if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
         MirrorRect(&DCDest->erclWindow, &SourceRect);
-#endif
 
     if (UsesSource)
     {
