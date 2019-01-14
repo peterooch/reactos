@@ -157,6 +157,10 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
     else
         FLOATOBJ_SetLong(&pmx->efM11, 1);
 
+#if 0
+    if (pdcattr->dwLayout & LAYOUT_RTL)
+        FLOATOBJ_MulLong(&pmx->efM11, -1);
+#endif
     if (szlWindowExt.cy != 0)
     {
         FLOATOBJ_SetLong(&pmx->efM22, pszlViewPortExt->cy);
@@ -169,6 +173,20 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
     FLOATOBJ_SetLong(&pmx->efDx, -pdcattr->ptlWindowOrg.x);
     FLOATOBJ_Mul(&pmx->efDx, &pmx->efM11);
     FLOATOBJ_AddLong(&pmx->efDx, pdcattr->ptlViewportOrg.x);
+
+#if 0 /* see wine dlls/gdi32/dc.c construct_window_to_viewport() */
+    if (pdcattr->dwLayout & LAYOUT_RTL)
+    {
+        FLOATOBJ temp_efDx;
+        /* What is the equivalent for vis_rect? */
+        FLOATOBJ_SetLong(&temp_efDx, pdc->erclWindow.right);
+        FLOATOBJ_SubLong(&temp_efDx, pdc->erclWindow.left);
+        FLOATOBJ_SubLong(&temp_efDx, 1);
+        FLOATOBJ_Sub(&temp_efDx, &pmx->efDx);
+
+        pmx->efDx = temp_efDx;
+    }
+#endif
 
     /* Calculate y offset */
     FLOATOBJ_SetLong(&pmx->efDy, -pdcattr->ptlWindowOrg.y);
