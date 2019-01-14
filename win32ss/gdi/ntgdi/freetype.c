@@ -5610,12 +5610,6 @@ GreExtTextOutW(
         IntLPtoDP(dc, (POINT *)lprc, 2);
     }
 
-    if (pdcattr->dwLayout & LAYOUT_RTL && lprc)
-    {
-        /* Reposition Rect */
-        MirrorRect(&dc->erclWindow, lprc);
-    }
-
     if (pdcattr->flTextAlign & TA_UPDATECP)
     {
         Start.x = pdcattr->ptlCurrent.x;
@@ -5624,8 +5618,15 @@ GreExtTextOutW(
         Start.x = XStart;
         Start.y = YStart;
     }
-
     IntLPtoDP(dc, &Start, 1);
+
+    if (pdcattr->dwLayout & LAYOUT_RTL && lprc)
+    {
+        /* Reposition Rect */
+        MirrorRect(&dc->erclWindow, lprc);
+        Start.x = GetPDCWidth(dc) - (Start.x + 1);
+    }
+
     RealXStart64 = ((LONGLONG)Start.x + dc->ptlDCOrig.x) << 6;
     YStart = Start.y + dc->ptlDCOrig.y;
 
@@ -5849,13 +5850,14 @@ GreExtTextOutW(
     }
     else if ((pdcattr->flTextAlign & TA_RIGHT) == TA_RIGHT)
     {
+        RealXStart64 -= TextWidth64;
+
+        if (((RealXStart64 + TextWidth64 + 32) >> 6) <= Start.x + dc->ptlDCOrig.x)
+            RealXStart64 += 1 << 6;
+
         /*All these bit shifts are nauseating*/
         if (pdcattr->dwLayout & LAYOUT_RTL)
         {
-            /* Go forward to the right edge of the dc, then go backwards to the mirrored x position
-               and then go further backwards to the real x position */
-            RealXStart64 = ((dc->ptlDCOrig.x + GetPDCWidth(dc)) << 6) - (RealXStart64 - (dc->ptlDCOrig.x << 6)) - TextWidth64;
-
             /* Haxx, makes buttons somewhat viewable */
             if ((fuOptions & ETO_CLIPPED && lprc) &&
                 ((RealXStart64 + TextWidth64 + 32) >> 6) >= dc->ptlDCOrig.x + lprc->right)
@@ -5866,13 +5868,6 @@ GreExtTextOutW(
             {
                 RealXStart64 = ((dc->ptlDCOrig.x + GetPDCWidth(dc)) << 6) - TextWidth64;
             }
-        }
-        else
-        {
-            RealXStart64 -= TextWidth64;
-
-            if (((RealXStart64 + TextWidth64 + 32) >> 6) <= Start.x + dc->ptlDCOrig.x)
-                RealXStart64 += 1 << 6;
         }
     }
 
