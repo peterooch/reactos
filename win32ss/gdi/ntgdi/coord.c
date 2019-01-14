@@ -1073,13 +1073,21 @@ DC_vSetLayout(
     IN DWORD dwLayout)
 {
     PDC_ATTR pdcattr = pdc->pdcattr;
+    DWORD dwPrevLayout = pdcattr->dwLayout;
+
+    /*Identical value, dont change anything*/
+    if (dwPrevLayout == dwLayout)
+        return;
 
     pdcattr->dwLayout = dwLayout;
 
     if (!(dwLayout & LAYOUT_ORIENTATIONMASK)) return;
 
-    if (dwLayout & LAYOUT_RTL)
+    if (dwLayout & LAYOUT_RTL && !(dwPrevLayout & LAYOUT_RTL))
     {
+        if ((pdcattr->flTextAlign & TA_CENTER) != TA_CENTER)
+            pdcattr->flTextAlign ^= TA_RIGHT;
+
         pdcattr->iMapMode = MM_ANISOTROPIC;
     }
 

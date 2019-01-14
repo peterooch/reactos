@@ -5559,7 +5559,6 @@ GreExtTextOutW(
     FT_Matrix mat1, mat2 = identityMat;
     FT_Vector vecs[9];
     POINT pts[9];
-    LONG lTextAlign, DCWidth;
 
     /* Check if String is valid */
     if ((Count > 0xFFFF) || (Count > 0 && String == NULL))
@@ -5605,26 +5604,19 @@ GreExtTextOutW(
     }
 
     pdcattr = dc->pdcattr;
-    lTextAlign = pdcattr->lTextAlign;
-    DCWidth = GetPDCWidth(dc);
 
     if (lprc && (fuOptions & (ETO_OPAQUE | ETO_CLIPPED)))
     {
         IntLPtoDP(dc, (POINT *)lprc, 2);
     }
 
-    if (pdcattr->dwLayout & LAYOUT_RTL)
+    if (pdcattr->dwLayout & LAYOUT_RTL && lprc)
     {
-        /* Wine does this */
-        if ((lTextAlign & TA_CENTER) != TA_CENTER)
-            lTextAlign ^= TA_RIGHT;
-
-        /* Reposition rect */
-        if (lprc)
-            MirrorRect(&dc->erclWindow, lprc);
+        /* Reposition Rect */
+        MirrorRect(&dc->erclWindow, lprc);
     }
 
-    if (lTextAlign & TA_UPDATECP)
+    if (pdcattr->flTextAlign & TA_UPDATECP)
     {
         Start.x = pdcattr->ptlCurrent.x;
         Start.y = pdcattr->ptlCurrent.y;
@@ -5749,12 +5741,12 @@ GreExtTextOutW(
      * Process the vertical alignment and determine DY1 and DY2.
      */
 #define VALIGN_MASK  (TA_TOP | TA_BASELINE | TA_BOTTOM)
-    if ((lTextAlign & VALIGN_MASK) == TA_BASELINE)
+    if ((pdcattr->flTextAlign & VALIGN_MASK) == TA_BASELINE)
     {
         DY1 = FontGDI->tmAscent;
         DY2 = FontGDI->tmDescent;
     }
-    else if ((lTextAlign & VALIGN_MASK) == TA_BOTTOM)
+    else if ((pdcattr->flTextAlign & VALIGN_MASK) == TA_BOTTOM)
     {
         DY1 = FontGDI->tmHeight;
         DY2 = 0;
@@ -5778,7 +5770,7 @@ GreExtTextOutW(
     use_kerning = FT_HAS_KERNING(face);
     previous = 0;
     if ((fuOptions & ETO_OPAQUE) ||
-        (lTextAlign & (TA_CENTER | TA_RIGHT)) ||
+        (pdcattr->flTextAlign & (TA_CENTER | TA_RIGHT)) ||
         lfEscapement || plf->lfUnderline || plf->lfStrikeOut)
     {
         TextLeft64 = RealXStart64;
@@ -5851,18 +5843,18 @@ GreExtTextOutW(
     /*
      * Process the horizontal alignment and modify XStart accordingly.
      */
-    if ((lTextAlign & TA_CENTER) == TA_CENTER)
+    if ((pdcattr->flTextAlign & TA_CENTER) == TA_CENTER)
     {
         RealXStart64 -= TextWidth64 / 2;
     }
-    else if ((lTextAlign & TA_RIGHT) == TA_RIGHT)
+    else if ((pdcattr->flTextAlign & TA_RIGHT) == TA_RIGHT)
     {
         /*All these bit shifts are nauseating*/
         if (pdcattr->dwLayout & LAYOUT_RTL)
         {
             /* Go forward to the right edge of the dc, then go backwards to the mirrored x position
                and then go further backwards to the real x position */
-            RealXStart64 = ((dc->ptlDCOrig.x + DCWidth) << 6) - (RealXStart64 - (dc->ptlDCOrig.x << 6)) - TextWidth64;
+            RealXStart64 = ((dc->ptlDCOrig.x + GetPDCWidth(dc)) << 6) - (RealXStart64 - (dc->ptlDCOrig.x << 6)) - TextWidth64;
 
             /* Haxx, makes buttons somewhat viewable */
             if ((fuOptions & ETO_CLIPPED && lprc) &&
@@ -5870,9 +5862,9 @@ GreExtTextOutW(
             {
                 RealXStart64 = ((dc->ptlDCOrig.x + lprc->right) << 6) - TextWidth64;
             }
-            else if (((RealXStart64 + TextWidth64 + 32) >> 6) >= dc->ptlDCOrig.x + DCWidth)
+            else if (((RealXStart64 + TextWidth64 + 32) >> 6) >= dc->ptlDCOrig.x + GetPDCWidth(dc))
             {
-                RealXStart64 = ((dc->ptlDCOrig.x + DCWidth) << 6) - TextWidth64;
+                RealXStart64 = ((dc->ptlDCOrig.x + GetPDCWidth(dc)) << 6) - TextWidth64;
             }
         }
         else
@@ -6305,7 +6297,7 @@ GreExtTextOutW(
             MouseSafetyOnDrawEnd(dc->ppdev);
     }
 
-    if (lTextAlign & TA_UPDATECP) {
+    if (pdcattr->flTextAlign & TA_UPDATECP) {
         pdcattr->ptlCurrent.x = DestRect.right - dc->ptlDCOrig.x;
     }
 
