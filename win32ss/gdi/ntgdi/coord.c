@@ -156,10 +156,9 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
     }
     else
         FLOATOBJ_SetLong(&pmx->efM11, 1);
-
 #if 0
     if (pdcattr->dwLayout & LAYOUT_RTL)
-        FLOATOBJ_MulLong(&pmx->efM11, -1);
+        FLOATOBJ_Neg(&pmx->efM11);
 #endif
     if (szlWindowExt.cy != 0)
     {
@@ -179,9 +178,7 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
     {
         FLOATOBJ temp_efDx;
         /* What is the equivalent for vis_rect? */
-        FLOATOBJ_SetLong(&temp_efDx, pdc->erclWindow.right);
-        FLOATOBJ_SubLong(&temp_efDx, pdc->erclWindow.left);
-        FLOATOBJ_SubLong(&temp_efDx, 1);
+        FLOATOBJ_SetLong(&temp_efDx, GetPDCWidth(pdc) - 1);
         FLOATOBJ_Sub(&temp_efDx, &pmx->efDx);
 
         pmx->efDx = temp_efDx;
@@ -588,10 +585,10 @@ NtGdiOffsetViewportOrgEx(
             ProbeForWrite(UnsafePoint, sizeof(POINT), 1);
             UnsafePoint->x = pdcattr->ptlViewportOrg.x;
             UnsafePoint->y = pdcattr->ptlViewportOrg.y;
-            if (pdcattr->dwLayout & LAYOUT_RTL)
+            /*if (pdcattr->dwLayout & LAYOUT_RTL)
             {
                 UnsafePoint->x = -UnsafePoint->x;
-            }
+            } */
         }
         _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
         {
@@ -607,10 +604,10 @@ NtGdiOffsetViewportOrgEx(
         }
     }
 
-    if (pdcattr->dwLayout & LAYOUT_RTL)
+    /*if (pdcattr->dwLayout & LAYOUT_RTL)
     {
         XOffset = -XOffset;
-    }
+    }*/
     pdcattr->ptlViewportOrg.x += XOffset;
     pdcattr->ptlViewportOrg.y += YOffset;
     pdcattr->flXform |= PAGE_XLATE_CHANGED;
@@ -782,7 +779,7 @@ NtGdiScaleWindowExtEx(
             ProbeForWrite(pSize, sizeof(SIZE), 1);
 
             X = pdcattr->szlWindowExt.cx;
-            if (pdcattr->dwLayout & LAYOUT_RTL) X = -X;
+            //if (pdcattr->dwLayout & LAYOUT_RTL) X = -X;
             pSize->cx = X;
             pSize->cy = pdcattr->szlWindowExt.cy;
         }
@@ -1057,10 +1054,10 @@ FASTCALL
 IntMirrorWindowOrg(PDC dc)
 {
     PDC_ATTR pdcattr;
-    LONG X, cx;
+    //LONG X, cx;
 
     pdcattr = dc->pdcattr;
-
+#if 0
     if (!(pdcattr->dwLayout & LAYOUT_RTL))
     {
         pdcattr->ptlWindowOrg.x = pdcattr->lWindowOrgx; // Flip it back.
@@ -1078,6 +1075,7 @@ IntMirrorWindowOrg(PDC dc)
     X = (X * pdcattr->szlWindowExt.cx) / cx;
 
     pdcattr->ptlWindowOrg.x = pdcattr->lWindowOrgx - X; // Now set the inverted win origion.
+#endif
     pdcattr->flXform |= PAGE_XLATE_CHANGED;
 
     return;
@@ -1092,6 +1090,10 @@ DC_vSetLayout(
 {
     PDC_ATTR pdcattr = pdc->pdcattr;
     DWORD dwPrevLayout = pdcattr->dwLayout;
+#if 0
+    XFORML rtlxform;
+    XFORMOBJ rtlxformobj;
+#endif
 
     /*Identical value, dont change anything*/
     if (dwPrevLayout == dwLayout)
@@ -1107,6 +1109,18 @@ DC_vSetLayout(
             pdcattr->flTextAlign ^= TA_RIGHT;
 
         pdcattr->iMapMode = MM_ANISOTROPIC;
+#if 0
+        /* Mirror x axis, then offset to right by width */
+        rtlxform.eM11 = (double)((-1.0)*(pdcattr->szlViewportExt.cx / pdcattr->szlWindowExt.cx));
+        rtlxform.eM12 = 0.0;
+        rtlxform.eM21 = 0.0;
+        rtlxform.eM22 = (double)(pdcattr->szlViewportExt.cy / pdcattr->szlWindowExt.cy);
+        rtlxform.eDx  = (double)(GetPDCWidth(pdc) - 1 - pdcattr->ptlViewportOrg.x - (pdcattr->ptlWindowOrg.x * rtlxform.eM11));
+        rtlxform.eDy  = (double)(pdcattr->ptlViewportOrg.y - (pdcattr->ptlWindowOrg.y * rtlxform.eM22));
+
+        XFORMOBJ_vInit(&rtlxformobj, &pdcattr->mxWorldToPage);
+        XFORMOBJ_iSetXform(&rtlxformobj, &rtlxform);
+#endif
     }
 
     //pdcattr->szlWindowExt.cy = -pdcattr->szlWindowExt.cy;
