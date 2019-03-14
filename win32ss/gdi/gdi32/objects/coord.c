@@ -394,11 +394,11 @@ GetViewportOrgEx(
     /* Get the current viewport org */
     lpPoint->x = pdcattr->ptlViewportOrg.x;
     lpPoint->y = pdcattr->ptlViewportOrg.y;
-
+#if 0
     /* Handle right-to-left layout */
     if (pdcattr->dwLayout & LAYOUT_RTL)
         lpPoint->x = -lpPoint->x;
-
+#endif
     return TRUE;
 }
 
@@ -422,10 +422,11 @@ GetWindowExtEx(
     /* Get the current window extension */
     lpSize->cx = pdcattr->szlWindowExt.cx;
     lpSize->cy = pdcattr->szlWindowExt.cy;
-
+#if 0
     /* Handle right-to-left layout */
     if (pdcattr->dwLayout & LAYOUT_RTL)
         lpSize->cx = -lpSize->cx;
+#endif
 
     return TRUE;
 }
@@ -506,10 +507,11 @@ SetViewportExtEx(
         /* Set the new viewport extension */
         pdcattr->szlViewportExt.cx = nXExtent;
         pdcattr->szlViewportExt.cy = nYExtent;
-
+#if 0
         /* Handle right-to-left layout */
         if (pdcattr->dwLayout & LAYOUT_RTL)
             NtGdiMirrorWindowOrg(hdc);
+#endif
 
         /* Update xform flags */
         pdcattr->flXform |= (PAGE_EXTENTS_CHANGED|INVALIDATE_ATTRIBUTES|DEVICE_TO_WORLD_INVALID);
@@ -600,17 +602,19 @@ SetWindowExtEx(
         lpSize->cx = pdcattr->szlWindowExt.cx;
         lpSize->cy = pdcattr->szlWindowExt.cy;
 
+#if 0
         /* Handle right-to-left layout */
         if (pdcattr->dwLayout & LAYOUT_RTL)
             lpSize->cx = -lpSize->cx;
+#endif
     }
 
-    if (pdcattr->dwLayout & LAYOUT_RTL)
+/*    if (pdcattr->dwLayout & LAYOUT_RTL)
     {
         NtGdiMirrorWindowOrg(hdc);
         pdcattr->flXform |= (PAGE_EXTENTS_CHANGED|INVALIDATE_ATTRIBUTES|DEVICE_TO_WORLD_INVALID);
     }
-    else if ((pdcattr->iMapMode == MM_ISOTROPIC) ||
+    else */if ((pdcattr->iMapMode == MM_ISOTROPIC) ||
              (pdcattr->iMapMode == MM_ANISOTROPIC))
     {
         if ((pdcattr->szlWindowExt.cx == nXExtent) &&
@@ -631,9 +635,10 @@ SetWindowExtEx(
 
         pdcattr->szlWindowExt.cx = nXExtent;
         pdcattr->szlWindowExt.cy = nYExtent;
+#if 0
         if (pdcattr->dwLayout & LAYOUT_RTL)
             NtGdiMirrorWindowOrg(hdc);
-
+#endif
         pdcattr->flXform |= (PAGE_EXTENTS_CHANGED|INVALIDATE_ATTRIBUTES|DEVICE_TO_WORLD_INVALID);
     }
 
