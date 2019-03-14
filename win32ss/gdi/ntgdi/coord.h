@@ -186,8 +186,8 @@ FORCEINLINE VOID IntMirrorCoords(PDC pdc, PVOID pvCoords, INT nConvType)
     LONG RectWidth;
 
     /* This or pdc->erclWindow */
-    //REGION_GetRgnBox(pdc->prgnVis, &visRect);
-    visRect = pdc->erclWindow;
+    REGION_GetRgnBox(pdc->prgnVis, &visRect);
+    //visRect = pdc->erclWindow;
 
     if (nConvType == MIRROR_POINT)
     {

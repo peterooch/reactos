@@ -1108,7 +1108,7 @@ DC_vSetLayout(
 
     if (dwLayout & LAYOUT_RTL && !(dwLayout & LAYOUT_RTL))
     {
-        if ((pdcattr->flTextAlign & TA_CENTER) != TA_CENTER)
+        if (!(pdcattr->flTextAlign & TA_CENTER))
             pdcattr->flTextAlign ^= TA_RIGHT;
 
         pdcattr->iMapMode = MM_ANISOTROPIC;
