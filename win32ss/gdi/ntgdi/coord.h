@@ -168,3 +168,37 @@ BOOL WINAPI GreGetViewportExtEx( _In_ HDC hdc, _Out_ LPSIZE lpSize);
 BOOL FASTCALL GreSetViewportOrgEx(HDC,int,int,LPPOINT);
 BOOL WINAPI GreGetDCOrgEx(_In_ HDC, _Out_ PPOINTL, _Out_ PRECTL);
 BOOL WINAPI GreSetDCOrg(_In_  HDC, _In_ LONG, _In_ LONG, _In_opt_ PRECTL);
+
+/* Mirroring helpers */
+#define MIRROR_POINT 1
+#define MIRROR_RECT  2
+
+#define GetRectWidth(rect) (rect.right - rect.left)
+#define GetPRectWidth(prect) (prect->right - prect->left)
+#define IsPWNDMirrored(pwnd) (pwnd->ExStyle & WS_EX_LAYOUTRTL)
+#define IsPDCMirrored(pdc) (pdc->pdcattr->dwLayout & LAYOUT_RTL)
+
+FORCEINLINE VOID IntMirrorCoords(PDC pdc, PVOID pvCoords, INT nConvType)
+{
+    RECTL visRect;
+    PRECTL pRect;
+    PPOINTL pPoint;
+    LONG RectWidth;
+
+    /* This or pdc->erclWindow */
+    //REGION_GetRgnBox(pdc->prgnVis, &visRect);
+    visRect = pdc->erclWindow;
+
+    if (nConvType == MIRROR_POINT)
+    {
+        pPoint = (PPOINTL)pvCoords;
+        pPoint->x = GetRectWidth(visRect) - pPoint->x;
+    }
+    else if (nConvType == MIRROR_RECT)
+    {
+        pRect = (PRECTL)pvCoords;
+        RectWidth = GetPRectWidth(pRect);
+        pRect->right = GetRectWidth(visRect) - pRect->left;
+        pRect->left = pRect->right - RectWidth;
+    }
+}
