@@ -318,6 +318,9 @@ NtGdiIntersectClipRect(
     rect.bottom = yBottom;
     IntLPtoDP(pdc, (LPPOINT)&rect, 2);
 
+    if (pdc->pdcattr->dwLayout & LAYOUT_RTL)
+        IntMirrorCoords(pdc, &rect, MIRROR_RECT);
+
     /* Check if we already have a clip region */
     if (pdc->dclevel.prgnClip != NULL)
     {
