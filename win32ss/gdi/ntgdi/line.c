@@ -177,6 +177,12 @@ IntGdiLineTo(DC  *dc,
 
         IntLPtoDP(dc, Points, 2);
 
+        if (pdcattr->dwLayout & LAYOUT_RTL)
+        {
+            IntMirrorCoords(dc, &Points[0], MIRROR_POINT);
+            IntMirrorCoords(dc, &Points[1], MIRROR_POINT);
+        }
+
         /* The DCOrg is in device coordinates */
         Points[0].x += dc->ptlDCOrig.x;
         Points[0].y += dc->ptlDCOrig.y;
@@ -324,6 +330,9 @@ IntGdiPolyline(DC      *dc,
             /* Offset the array of points by the DC origin */
             for (i = 0; i < Count; i++)
             {
+                if (pdcattr->dwLayout & LAYOUT_RTL)
+                    IntMirrorCoords(dc, &Points[i], MIRROR_POINT);
+
                 Points[i].x += dc->ptlDCOrig.x;
                 Points[i].y += dc->ptlDCOrig.y;
             }
@@ -447,6 +456,9 @@ NtGdiLineTo(HDC  hDC,
     rcLockRect.bottom = YEnd;
 
     IntLPtoDP(dc, &rcLockRect, 2);
+
+    if (dc->pdcattr->dwLayout & LAYOUT_RTL)
+        IntMirrorCoords(dc, &rcLockRect, MIRROR_RECT);
 
     /* The DCOrg is in device coordinates */
     rcLockRect.left += dc->ptlDCOrig.x;

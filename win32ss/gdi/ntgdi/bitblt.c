@@ -73,6 +73,9 @@ NtGdiAlphaBlend(
     DestRect.bottom = YOriginDest + HeightDest;
     IntLPtoDP(DCDest, (LPPOINT)&DestRect, 2);
 
+    if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
+        IntMirrorCoords(DCSrc, &DestRect, MIRROR_RECT);
+
     DestRect.left   += DCDest->ptlDCOrig.x;
     DestRect.top    += DCDest->ptlDCOrig.y;
     DestRect.right  += DCDest->ptlDCOrig.x;
@@ -88,6 +91,9 @@ NtGdiAlphaBlend(
     SourceRect.right  = XOriginSrc + WidthSrc;
     SourceRect.bottom = YOriginSrc + HeightSrc;
     IntLPtoDP(DCSrc, (LPPOINT)&SourceRect, 2);
+
+    if (DCDest->pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
+        IntMirrorCoords(DCDest, &SourceRect, MIRROR_RECT);
 
     SourceRect.left   += DCSrc->ptlDCOrig.x;
     SourceRect.top    += DCSrc->ptlDCOrig.y;
@@ -251,6 +257,9 @@ NtGdiTransparentBlt(
     rcDest.bottom = rcDest.top + cyDst;
     IntLPtoDP(DCDest, (LPPOINT)&rcDest, 2);
 
+    if (DCDest->pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
+        IntMirrorCoords(DCDest, &rcDest, MIRROR_RECT);
+
     rcDest.left   += DCDest->ptlDCOrig.x;
     rcDest.top    += DCDest->ptlDCOrig.y;
     rcDest.right  += DCDest->ptlDCOrig.x;
@@ -261,6 +270,9 @@ NtGdiTransparentBlt(
     rcSrc.right  = rcSrc.left + cxSrc;
     rcSrc.bottom = rcSrc.top + cySrc;
     IntLPtoDP(DCSrc, (LPPOINT)&rcSrc, 2);
+
+    if (DCDest->pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
+        IntMirrorCoords(DCDest, &rcSrc, MIRROR_RECT);
 
     rcSrc.left   += DCSrc->ptlDCOrig.x;
     rcSrc.top    += DCSrc->ptlDCOrig.y;
@@ -425,6 +437,9 @@ NtGdiMaskBlt(
     DestRect.bottom = nYDest + nHeight;
     IntLPtoDP(DCDest, (LPPOINT)&DestRect, 2);
 
+    if (DCDest->pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
+        IntMirrorCoords(DCDest, &DestRect, MIRROR_RECT);
+
     DestRect.left   += DCDest->ptlDCOrig.x;
     DestRect.top    += DCDest->ptlDCOrig.y;
     DestRect.right  += DCDest->ptlDCOrig.x;
@@ -448,7 +463,13 @@ NtGdiMaskBlt(
         SourceRect.left = SourcePoint.x;
         SourceRect.top = SourcePoint.y;
         SourceRect.right = SourcePoint.x + DestRect.right - DestRect.left;
-        SourceRect.bottom = SourcePoint.y + DestRect.bottom - DestRect.top ;
+        SourceRect.bottom = SourcePoint.y + DestRect.bottom - DestRect.top;
+
+        if (DCSrc->pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
+        {
+            IntMirrorCoords(DCSrc, &SourceRect, MIRROR_RECT);
+            IntMirrorCoords(DCSrc, &SourcePoint, MIRROR_POINT);
+        }
     }
     else
     {
@@ -628,6 +649,9 @@ GreStretchBltMask(
     DestRect.bottom = YOriginDest+HeightDest;
     IntLPtoDP(DCDest, (LPPOINT)&DestRect, 2);
 
+    if (pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
+        IntMirrorCoords(DCDest, &DestRect, MIRROR_RECT);
+
     DestRect.left   += DCDest->ptlDCOrig.x;
     DestRect.top    += DCDest->ptlDCOrig.y;
     DestRect.right  += DCDest->ptlDCOrig.x;
@@ -646,6 +670,9 @@ GreStretchBltMask(
     if (UsesSource)
     {
         IntLPtoDP(DCSrc, (LPPOINT)&SourceRect, 2);
+
+        if (pdcattr->dwLayout & LAYOUT_RTL && DCSrc != DCDest)
+            IntMirrorCoords(DCSrc, &SourceRect, MIRROR_RECT);
 
         SourceRect.left   += DCSrc->ptlDCOrig.x;
         SourceRect.top    += DCSrc->ptlDCOrig.y;
@@ -699,6 +726,10 @@ GreStretchBltMask(
         MaskPoint.x = XOriginMask;
         MaskPoint.y = YOriginMask;
         IntLPtoDP(DCMask, &MaskPoint, 1);
+
+        if (DCMask->pdcattr->dwLayout & LAYOUT_RTL)
+            IntMirrorCoords(DCMask, &MaskPoint, MIRROR_POINT);
+
         MaskPoint.x += DCMask->ptlDCOrig.x;
         MaskPoint.y += DCMask->ptlDCOrig.y;
     }
@@ -821,6 +852,9 @@ IntPatBlt(
     }
 
     IntLPtoDP(pdc, (LPPOINT)&DestRect, 2);
+
+    if (pdc->pdcattr->dwLayout & LAYOUT_RTL)
+        IntMirrorCoords(pdc, &DestRect, MIRROR_RECT);
 
     DestRect.left   += pdc->ptlDCOrig.x;
     DestRect.top    += pdc->ptlDCOrig.y;
