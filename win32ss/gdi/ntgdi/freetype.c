@@ -5605,6 +5605,18 @@ IntExtTextOutW(
         Start.y = YStart;
     }
 
+    if (pdcattr->dwLayout & LAYOUT_RTL)
+    {
+        RECTL visRect;
+
+        REGION_GetRgnBox(dc->prgnVis, &visRect);
+        IntDPtoLP(dc, (PPOINTL)&visRect, 2);
+        Start.x = GetRectWidth(visRect) - (Start.x + 1);
+        
+        if (lprc)
+            IntMirrorCoords(dc, lprc, MIRROR_RECT);
+    }
+
     SourcePoint.x = 0;
     SourcePoint.y = 0;
     MaskRect.left = 0;
