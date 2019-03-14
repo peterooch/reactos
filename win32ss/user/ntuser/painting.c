@@ -2283,10 +2283,16 @@ BOOL UserDrawCaption(
 
       if (pIcon)
       {
-         LONG cx = UserGetSystemMetrics(SM_CXSMICON);
-         LONG cy = UserGetSystemMetrics(SM_CYSMICON);
-         LONG x = Rect.left - cx/2 + 1 + (Rect.bottom - Rect.top)/2; // this is really what Window does
-         LONG y = (Rect.top + Rect.bottom - cy)/2; // center
+         LONG cx, cy, x, y;
+         cx = UserGetSystemMetrics(SM_CXSMICON);
+         cy = UserGetSystemMetrics(SM_CYSMICON);
+
+         if (IsPWNDMirrored(pWnd))
+             x = Rect.right - (cx / 2 + 1 + (Rect.bottom - Rect.top) / 2) - 1;
+         else
+             x = Rect.left - cx/2 + 1 + (Rect.bottom - Rect.top)/2; // this is really what Window does
+         
+         y = (Rect.top + Rect.bottom - cy)/2; // center
          UserDrawIconEx(hDc, x, y, pIcon, cx, cy, 0, NULL, DI_NORMAL);
          UserDereferenceObject(pIcon);
       }
