@@ -156,6 +156,10 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
     }
     else
         FLOATOBJ_SetLong(&pmx->efM11, 1);
+#if 0
+    if (pdcattr->dwLayout & LAYOUT_RTL)
+        FLOATOBJ_Neg(&pmx->efM11);
+#endif
 
     if (szlWindowExt.cy != 0)
     {
@@ -169,6 +173,22 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
     FLOATOBJ_SetLong(&pmx->efDx, -pdcattr->ptlWindowOrg.x);
     FLOATOBJ_Mul(&pmx->efDx, &pmx->efM11);
     FLOATOBJ_AddLong(&pmx->efDx, pdcattr->ptlViewportOrg.x);
+#if 0 /* This ruins many things */
+    /* see wine dlls/gdi32/dc.c construct_window_to_viewport() */
+    if (pdcattr->dwLayout & LAYOUT_RTL)
+    {
+        FLOATOBJ new_efDx;
+        RECTL visRect;
+
+        RtlZeroMemory(&new_efDx, sizeof(new_efDx));
+        RtlZeroMemory(&visRect, sizeof(visRect));
+        REGION_GetRgnBox(pdc->prgnVis, &visRect);
+        FLOATOBJ_SetLong(&new_efDx, visRect.right - visRect.left - 1);
+        FLOATOBJ_Sub(&new_efDx, &pmx->efDx);
+
+        RtlCopyBytes(&pmx->efDx, &new_efDx, sizeof(FLOATOBJ));
+    }
+#endif
 
     /* Calculate y offset */
     FLOATOBJ_SetLong(&pmx->efDy, -pdcattr->ptlWindowOrg.y);
@@ -570,10 +590,12 @@ NtGdiOffsetViewportOrgEx(
             ProbeForWrite(UnsafePoint, sizeof(POINT), 1);
             UnsafePoint->x = pdcattr->ptlViewportOrg.x;
             UnsafePoint->y = pdcattr->ptlViewportOrg.y;
+#if 0
             if (pdcattr->dwLayout & LAYOUT_RTL)
             {
                 UnsafePoint->x = -UnsafePoint->x;
             }
+#endif
         }
         _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
         {
@@ -588,11 +610,12 @@ NtGdiOffsetViewportOrgEx(
             return FALSE;
         }
     }
-
+#if 0
     if (pdcattr->dwLayout & LAYOUT_RTL)
     {
         XOffset = -XOffset;
     }
+#endif
     pdcattr->ptlViewportOrg.x += XOffset;
     pdcattr->ptlViewportOrg.y += YOffset;
     pdcattr->flXform |= PAGE_XLATE_CHANGED;
@@ -764,7 +787,7 @@ NtGdiScaleWindowExtEx(
             ProbeForWrite(pSize, sizeof(SIZE), 1);
 
             X = pdcattr->szlWindowExt.cx;
-            if (pdcattr->dwLayout & LAYOUT_RTL) X = -X;
+            //if (pdcattr->dwLayout & LAYOUT_RTL) X = -X;
             pSize->cx = X;
             pSize->cy = pdcattr->szlWindowExt.cy;
         }
@@ -1038,10 +1061,10 @@ VOID
 FASTCALL
 IntMirrorWindowOrg(PDC dc)
 {
-    PDC_ATTR pdcattr;
+    PDC_ATTR pdcattr = dc->pdcattr;
+#if 0
     LONG X, cx;
 
-    pdcattr = dc->pdcattr;
 
     if (!(pdcattr->dwLayout & LAYOUT_RTL))
     {
@@ -1060,6 +1083,7 @@ IntMirrorWindowOrg(PDC dc)
     X = (X * pdcattr->szlWindowExt.cx) / cx;
 
     pdcattr->ptlWindowOrg.x = pdcattr->lWindowOrgx - X; // Now set the inverted win origion.
+#endif
     pdcattr->flXform |= PAGE_XLATE_CHANGED;
 
     return;
@@ -1073,13 +1097,20 @@ DC_vSetLayout(
     IN DWORD dwLayout)
 {
     PDC_ATTR pdcattr = pdc->pdcattr;
+    DWORD dwPrevLayout = pdcattr->dwLayout;
 
     pdcattr->dwLayout = dwLayout;
 
     if (!(dwLayout & LAYOUT_ORIENTATIONMASK)) return;
 
-    if (dwLayout & LAYOUT_RTL)
+    if (dwLayout == dwPrevLayout)
+        return; /*Identical value, dont change anything*/
+
+    if (dwLayout & LAYOUT_RTL && !(dwLayout & LAYOUT_RTL))
     {
+        if ((pdcattr->flTextAlign & TA_CENTER) != TA_CENTER)
+            pdcattr->flTextAlign ^= TA_RIGHT;
+
         pdcattr->iMapMode = MM_ANISOTROPIC;
     }
 
@@ -1090,8 +1121,6 @@ DC_vSetLayout(
     //    IntMirrorWindowOrg(pdc);
     //else
     //    pdcattr->ptlWindowOrg.x = wox - pdcattr->ptlWindowOrg.x;
-
-    if (!(pdcattr->flTextAlign & TA_CENTER)) pdcattr->flTextAlign |= TA_RIGHT;
 
     if (pdc->dclevel.flPath & DCPATH_CLOCKWISE)
         pdc->dclevel.flPath &= ~DCPATH_CLOCKWISE;
