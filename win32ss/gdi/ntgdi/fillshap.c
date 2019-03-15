@@ -53,7 +53,7 @@ IntGdiPolygon(PDC    dc,
     IntLPtoDP(dc, Points, Count);
     for (CurrentPoint = 0; CurrentPoint < Count; CurrentPoint++)
     {
-        if (pdcattr->dwLayout & LAYOUT_RTL)
+        if (IsPDCMirrored(dc))
             IntMirrorCoords(dc, &Points[CurrentPoint], MIRROR_POINT);
 
         Points[CurrentPoint].x += dc->ptlDCOrig.x;
@@ -290,7 +290,7 @@ NtGdiEllipse(
 
     IntLPtoDP(dc, (LPPOINT)&RectBounds, 2);
 
-    if (pdcattr->dwLayout & LAYOUT_RTL)
+    if (IsPDCMirrored(dc))
         IntMirrorCoords(dc, &RectBounds, MIRROR_RECT);
 
     RectBounds.left += dc->ptlDCOrig.x;
@@ -567,7 +567,7 @@ IntRectangle(PDC dc,
 
     IntLPtoDP(dc, (LPPOINT)&DestRect, 2);
 
-    if (pdcattr->dwLayout & LAYOUT_RTL)
+    if (IsPDCMirrored(dc))
         IntMirrorCoords(dc, &DestRect, MIRROR_RECT);
 
     DestRect.left   += dc->ptlDCOrig.x;
@@ -795,7 +795,7 @@ IntRoundRect(
 
     IntLPtoDP(dc, (LPPOINT)&RectBounds, 2);
 
-    if (pdcattr->dwLayout & LAYOUT_RTL)
+    if (IsPDCMirrored(dc))
         IntMirrorCoords(dc, &RectBounds, MIRROR_RECT);
 
     RectBounds.left   += dc->ptlDCOrig.x;
@@ -952,7 +952,7 @@ GreGradientFill(
     }
     IntLPtoDP(pdc, (LPPOINT)&rclExtent, 2);
     
-    if (pdc->pdcattr->dwLayout & LAYOUT_RTL)
+    if (IsPDCMirrored(pdc))
         IntMirrorCoords(pdc, &rclExtent, MIRROR_RECT);
 
     rclExtent.left   += pdc->ptlDCOrig.x;
@@ -1138,7 +1138,7 @@ NtGdiExtFloodFill(
         RECTL_vSetRect(&DestRect, 0, 0, psurf->SurfObj.sizlBitmap.cx, psurf->SurfObj.sizlBitmap.cy);
     }
 
-    if (dc->pdcattr->dwLayout & LAYOUT_RTL)
+    if (IsPDCMirrored(dc))
     {
         IntMirrorCoords(dc, &DestRect, MIRROR_RECT);
         IntMirrorCoords(dc, &Pt, MIRROR_POINT);
