@@ -5605,17 +5605,13 @@ IntExtTextOutW(
         Start.y = YStart;
     }
 
-    if (pdcattr->dwLayout & LAYOUT_RTL)
+    if (IsPDCMirrored(dc))
     {
         RECTL visRect;// = dc->erclWindow;
 
         REGION_GetRgnBox(dc->prgnVis, &visRect);
         IntDPtoLP(dc, (PPOINTL)&visRect, 2);
         Start.x = GetRectWidth(visRect) - (Start.x + 1);
-
-        /*Haxx*/
-        if ((pdcattr->flTextAlign & TA_RIGHT) != TA_RIGHT)
-            pdcattr->flTextAlign ^= TA_RIGHT;
         
         if (lprc)
             IntMirrorCoords(dc, lprc, MIRROR_RECT);

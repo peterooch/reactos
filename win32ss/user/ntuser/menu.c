@@ -2319,7 +2319,7 @@ static void FASTCALL MENU_DrawMenuItem(PWND Wnd, PMENU Menu, PWND WndOwner, HDC 
             RECT rectTemp;
             RtlCopyMemory(&rectTemp, &rect, sizeof(RECT));
             rectTemp.left = rectTemp.right - UserGetSystemMetrics(SM_CXMENUCHECK);
-            DrawFrameControl(hdc, &rectTemp, DFC_MENU, DFCS_MENUARROW);
+            DrawFrameControl(hdc, &rectTemp, DFC_MENU, IsPWNDMirrored(Wnd) ? DFCS_MENUARROWRIGHT : DFCS_MENUARROW);
         }
         return;
     }
@@ -2486,7 +2486,7 @@ static void FASTCALL MENU_DrawMenuItem(PWND Wnd, PMENU Menu, PWND WndOwner, HDC 
             RECT rectTemp;
             RtlCopyMemory(&rectTemp, &rect, sizeof(RECT));
             rectTemp.left = rectTemp.right - check_bitmap_width;
-            DrawFrameControl(hdc, &rectTemp, DFC_MENU, DFCS_MENUARROW);
+            DrawFrameControl(hdc, &rectTemp, DFC_MENU, IsPWNDMirrored(Wnd) ? DFCS_MENUARROWRIGHT : DFCS_MENUARROW);
         }
         rect.left += 4;
         if( !((Menu->fFlags & MNS_STYLE_MASK) & MNS_NOCHECK))

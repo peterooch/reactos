@@ -1101,12 +1101,10 @@ DC_vSetLayout(
 
     pdcattr->dwLayout = dwLayout;
 
-    if (!(dwLayout & LAYOUT_ORIENTATIONMASK)) return;
+    if (!(dwLayout & LAYOUT_ORIENTATIONMASK) || dwLayout == dwPrevLayout)
+        return;
 
-    if (dwLayout == dwPrevLayout)
-        return; /*Identical value, dont change anything*/
-
-    if (dwLayout & LAYOUT_RTL && !(dwLayout & LAYOUT_RTL))
+    if (dwLayout & LAYOUT_RTL && !(dwPrevLayout & LAYOUT_RTL))
     {
         if (!(pdcattr->flTextAlign & TA_CENTER))
             pdcattr->flTextAlign ^= TA_RIGHT;

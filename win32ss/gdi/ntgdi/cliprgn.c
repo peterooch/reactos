@@ -247,6 +247,9 @@ NtGdiExcludeClipRect(
     RECTL_vMakeWellOrdered(&rect);
     IntLPtoDP(pdc, (LPPOINT)&rect, 2);
 
+    if (IsPDCMirrored(pdc))
+        IntMirrorCoords(pdc, &rect, MIRROR_RECT);
+
     /* Check if we already have a clip region */
     if (pdc->dclevel.prgnClip != NULL)
     {
@@ -384,6 +387,9 @@ NtGdiOffsetClipRgn(
         apt[1].y = yOffset;
         IntLPtoDP(pdc, &apt, 2);
 
+        if (IsPDCMirrored(pdc))
+            IntMirrorCoords(pdc, &apt, MIRROR_RECT);
+
         /* Offset the clip region */
         if (!REGION_bOffsetRgn(pdc->dclevel.prgnClip,
                                apt[1].x - apt[0].x,
@@ -478,6 +484,10 @@ NtGdiRectVisible(
     if (dc->prgnRao)
     {
          IntLPtoDP(dc, (LPPOINT)&Rect, 2);
+         
+         if (IsPDCMirrored(dc))
+             IntMirrorCoords(dc, &Rect, MIRROR_RECT);
+
          Result = REGION_RectInRegion(dc->prgnRao, &Rect);
     }
     DC_UnlockDc(dc);
