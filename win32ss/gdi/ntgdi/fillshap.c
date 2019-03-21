@@ -287,6 +287,9 @@ NtGdiEllipse(
 
     IntLPtoDP(dc, (LPPOINT)&RectBounds, 2);
 
+    if (dc->pdcattr->dwLayout & LAYOUT_RTL)
+        RECTL_vMakeWellOrdered(&RectBounds);
+
     RectBounds.left += dc->ptlDCOrig.x;
     RectBounds.right += dc->ptlDCOrig.x;
     RectBounds.top += dc->ptlDCOrig.y;
@@ -561,6 +564,9 @@ IntRectangle(PDC dc,
 
     IntLPtoDP(dc, (LPPOINT)&DestRect, 2);
 
+    if (dc->pdcattr->dwLayout & LAYOUT_RTL)
+        RECTL_vMakeWellOrdered(&DestRect);
+
     DestRect.left   += dc->ptlDCOrig.x;
     DestRect.right  += dc->ptlDCOrig.x;
     DestRect.top    += dc->ptlDCOrig.y;
@@ -786,6 +792,9 @@ IntRoundRect(
 
     IntLPtoDP(dc, (LPPOINT)&RectBounds, 2);
 
+    if (dc->pdcattr->dwLayout & LAYOUT_RTL)
+        RECTL_vMakeWellOrdered(&RectBounds);
+
     RectBounds.left   += dc->ptlDCOrig.x;
     RectBounds.top    += dc->ptlDCOrig.y;
     RectBounds.right  += dc->ptlDCOrig.x;
@@ -939,6 +948,9 @@ GreGradientFill(
         rclExtent.bottom = max(rclExtent.bottom, (pVertex + i)->y);
     }
     IntLPtoDP(pdc, (LPPOINT)&rclExtent, 2);
+    
+    if (pdc->pdcattr->dwLayout & LAYOUT_RTL)
+        RECTL_vMakeWellOrdered(&rclExtent);
 
     rclExtent.left   += pdc->ptlDCOrig.x;
     rclExtent.right  += pdc->ptlDCOrig.x;
@@ -952,7 +964,7 @@ GreGradientFill(
     }
 
     ptlDitherOrg.x = ptlDitherOrg.y = 0;
-    IntLPtoDP(pdc, (LPPOINT)&ptlDitherOrg, 1);
+    //IntLPtoDP(pdc, (LPPOINT)&ptlDitherOrg, 1); /* FIXME: Issues with mirrored dcs */
 
     ptlDitherOrg.x += pdc->ptlDCOrig.x;
     ptlDitherOrg.y += pdc->ptlDCOrig.y;

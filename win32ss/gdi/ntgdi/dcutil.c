@@ -836,6 +836,10 @@ NtGdiSetBoundsRect(
         if (!(flags & DCB_WINDOWMGR))
         {           
            IntLPtoDP( pdc, (POINT *)&rcl, 2 );
+
+           if (pdc->pdcattr->dwLayout & LAYOUT_RTL)
+               RECTL_vMakeWellOrdered(&rcl);
+
            RECTL_bUnionRect(&pdc->erclBoundsApp, &pdc->erclBoundsApp, &rcl);
         }
         else

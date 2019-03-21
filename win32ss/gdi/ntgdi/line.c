@@ -448,6 +448,9 @@ NtGdiLineTo(HDC  hDC,
 
     IntLPtoDP(dc, &rcLockRect, 2);
 
+    if (dc->pdcattr->dwLayout & LAYOUT_RTL)
+        RECTL_vMakeWellOrdered(&rcLockRect);
+
     /* The DCOrg is in device coordinates */
     rcLockRect.left += dc->ptlDCOrig.x;
     rcLockRect.top += dc->ptlDCOrig.y;

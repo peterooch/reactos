@@ -104,6 +104,12 @@ IntArc( DC *dc,
     IntLPtoDP(dc, (LPPOINT)&RectBounds, 2);
     IntLPtoDP(dc, (LPPOINT)&RectSEpts, 2);
 
+    if (pdcattr->dwLayout & LAYOUT_RTL)
+    {
+        RECTL_vMakeWellOrdered(&RectBounds);
+        RECTL_vMakeWellOrdered(&RectSEpts);
+    }
+
     RectBounds.left   += dc->ptlDCOrig.x;
     RectBounds.right  += dc->ptlDCOrig.x;
     RectBounds.top    += dc->ptlDCOrig.y;

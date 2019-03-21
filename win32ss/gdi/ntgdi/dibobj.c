@@ -530,6 +530,9 @@ NtGdiSetDIBitsToDeviceInternal(
     if (bTransformCoordinates)
     {
         IntLPtoDP(pDC, (LPPOINT)&rcDest, 2);
+
+        if (pDC->pdcattr->dwLayout & LAYOUT_RTL)
+            RECTL_vMakeWellOrdered(&rcDest);
     }
     rcDest.left += pDC->ptlDCOrig.x;
     rcDest.top += pDC->ptlDCOrig.y;
@@ -1275,6 +1278,10 @@ NtGdiStretchDIBitsInternal(
     rcDst.right = rcDst.left + cxDst;
     rcDst.bottom = rcDst.top + cyDst;
     IntLPtoDP(pdc, (POINTL*)&rcDst, 2);
+
+    if (pdc->pdcattr->dwLayout & LAYOUT_RTL)
+        RECTL_vMakeWellOrdered(&rcDst);
+
     RECTL_vOffsetRect(&rcDst, pdc->ptlDCOrig.x, pdc->ptlDCOrig.y);
 
     if (pdc->fs & (DC_ACCUM_APP|DC_ACCUM_WMGR))

@@ -247,6 +247,9 @@ NtGdiExcludeClipRect(
     RECTL_vMakeWellOrdered(&rect);
     IntLPtoDP(pdc, (LPPOINT)&rect, 2);
 
+    if (pdc->pdcattr->dwLayout & LAYOUT_RTL)
+        RECTL_vMakeWellOrdered(&rect);
+
     /* Check if we already have a clip region */
     if (pdc->dclevel.prgnClip != NULL)
     {
@@ -317,6 +320,9 @@ NtGdiIntersectClipRect(
     rect.right = xRight;
     rect.bottom = yBottom;
     IntLPtoDP(pdc, (LPPOINT)&rect, 2);
+
+    if (pdc->pdcattr->dwLayout & LAYOUT_RTL)
+        RECTL_vMakeWellOrdered(&rect);
 
     /* Check if we already have a clip region */
     if (pdc->dclevel.prgnClip != NULL)
@@ -475,6 +481,10 @@ NtGdiRectVisible(
     if (dc->prgnRao)
     {
          IntLPtoDP(dc, (LPPOINT)&Rect, 2);
+
+         if (dc->pdcattr->dwLayout & LAYOUT_RTL)
+             RECTL_vMakeWellOrdered(&Rect);
+
          Result = REGION_RectInRegion(dc->prgnRao, &Rect);
     }
     DC_UnlockDc(dc);
