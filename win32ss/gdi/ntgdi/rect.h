@@ -106,3 +106,12 @@ RECTL_vInflateRect(
     _Inout_ RECTL *rect,
     _In_ INT dx,
     _In_ INT dy);
+
+FORCEINLINE
+LONG
+RECTL_vGetWidth(
+    _In_ const RECTL *rect
+)
+{
+    return rect->right - rect->left;
+}
