@@ -3018,6 +3018,9 @@ BOOL FASTCALL IntEndDeferWindowPosEx( HDWP hdwp, BOOL sAsync )
 
         UserRefObjectCo(pwnd, &Ref);
 
+        if (pwnd->ExStyle & WS_EX_LAYOUTRTL && pwnd->spwndParent)
+            winpos->pos.x = pwnd->spwndParent->rcClient.right - winpos->pos.x - RECTL_vGetWidth(&pwnd->rcClient);
+
         if ( sAsync )
         {
            LRESULT lRes;
