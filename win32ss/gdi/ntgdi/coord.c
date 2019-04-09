@@ -1095,7 +1095,7 @@ DC_vSetLayout(
 
     pdcattr->dwLayout = dwLayout;
 
-    if (!(dwLayout & LAYOUT_ORIENTATIONMASK) && dwLayout == dwPrevLayout)
+    if (!(dwLayout & LAYOUT_ORIENTATIONMASK) || dwLayout == dwPrevLayout)
         return;
 
     if (dwLayout & LAYOUT_RTL && !(dwPrevLayout & LAYOUT_RTL))
