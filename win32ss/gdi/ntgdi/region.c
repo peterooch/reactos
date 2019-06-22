@@ -3469,6 +3469,77 @@ REGION_SetPolyPolygonRgn(
     return TRUE;
 }
 
+/* Based on Wine's REGION_MirrorRegion() and mirror_region() (region type return) */
+BOOL
+FASTCALL
+REGION_MirrorRegion(
+    _Inout_ PREGION dest,
+    _In_ PREGION src,
+    _In_ INT width,
+    _Out_opt_ LPINT region_type
+)
+{
+    INT i, start, end;
+    RECT extents, src_bounds, *rects;
+    PREGION temp;
+
+    if (dest != src)
+    {
+        if (!REGION_bEnsureBufferSize(dest, src->rdh.nCount))
+             return FALSE;
+        
+        rects = dest->Buffer;
+        dest->rdh.nCount = src->rdh.nCount;
+    }
+    else
+    {
+        temp = REGION_AllocRgnWithHandle(src->rdh.nCount);
+
+        if (!temp)
+            return FALSE;
+
+        rects = temp->Buffer;
+    }
+
+    src_bounds = src->rdh.rcBound;
+    
+    extents.left   = width - src_bounds.right;
+    extents.right  = width - src_bounds.left;
+    extents.top    = src_bounds.top;
+    extents.bottom = src_bounds.bottom;
+
+    for (start = 0; start < src->rdh.nCount; start = end)
+    {
+        /* find the end of the current band */
+        for (end = start + 1; end < src->rdh.nCount; end++)
+        {
+            if (src->Buffer[end].top != src->Buffer[end - 1].top)
+                break;
+        }
+
+        for (i = 0; i < end - start; i++)
+        {
+            rects[start + i].left   = width - src->Buffer[end - i - 1].right;
+            rects[start + i].right  = width - src->Buffer[end - i - 1].left;
+            rects[start + i].top    = src->Buffer[end - i - 1].top;
+            rects[start + i].bottom = src->Buffer[end - i - 1].bottom;
+        }
+    }
+
+    if (dest == src)
+    {
+        REGION_CopyRegion(dest, temp);
+        REGION_Delete(temp);
+    }
+    
+    dest->rdh.rcBound = extents;
+
+    if (region_type)
+        *region_type = REGION_Complexity(dest);
+
+    return TRUE;
+}
+
 HRGN
 NTAPI
 GreCreatePolyPolygonRgn(

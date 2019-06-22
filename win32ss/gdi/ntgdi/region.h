@@ -76,6 +76,15 @@ REGION_bOffsetRgn(
     _In_ INT cx,
     _In_ INT cy);
 
+BOOL
+FASTCALL
+REGION_MirrorRegion(
+    _Inout_ PREGION dest,
+    _In_ PREGION src,
+    _In_ INT width,
+    _Out_opt_ LPINT region_type
+);
+
 BOOL FASTCALL IntRectInRegion(HRGN,LPRECTL);
 
 INT FASTCALL IntGdiCombineRgn(PREGION, PREGION, PREGION, INT);
