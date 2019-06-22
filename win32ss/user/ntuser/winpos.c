@@ -3074,6 +3074,9 @@ BOOL FASTCALL IntEndDeferWindowPosEx( HDWP hdwp, BOOL sAsync )
 
         UserRefObjectCo(pwnd, &Ref);
 
+        if (IsMirroredPWND(pwnd) && pwnd->spwndParent)
+            winpos->pos.x = pwnd->spwndParent->rcClient.right - winpos->pos.x - GetRECTWidth(pwnd->rcClient);
+
         if ( sAsync )
         {
            LRESULT lRes;

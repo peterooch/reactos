@@ -174,7 +174,7 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
     FLOATOBJ_Mul(&pmx->efDx, &pmx->efM11);
     FLOATOBJ_AddLong(&pmx->efDx, pdcattr->ptlViewportOrg.x);
 
-    if (pdcatttr->dwLayout & LAYOUT_RTL)
+    if (pdcattr->dwLayout & LAYOUT_RTL)
     {
         FLOATOBJ temp;
 
@@ -1059,7 +1059,7 @@ NtGdiSetWindowOrgEx(
 
     return TRUE;
 }
-#if 0
+
 //
 // Mirror Window function.
 //
@@ -1093,7 +1093,7 @@ IntMirrorWindowOrg(PDC dc)
 
     return;
 }
-#endif
+
 
 VOID
 NTAPI

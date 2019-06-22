@@ -192,7 +192,7 @@ IntSelectClipRgn(
             if (mirrored)
             {
                 REGION_MirrorRegion(mirrored, prgn, GetPDCWidth(dc), NULL);
-                REGION_CopyRegion(prgn, mirrored);
+                REGION_bCopy(prgn, mirrored);
                 REGION_Delete(mirrored);
             }
         }
