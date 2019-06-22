@@ -767,7 +767,7 @@ NtGdiGetRandomRgn(
             if (iCode == CLIPRGN || iCode == METARGN)
             {
                 if (pdc->pdcattr->dwLayout & LAYOUT_RTL)
-                    REGION_MirrorRegion(prgnDest, prgnDest, pdc->erclWindow.right - pdc->erclWindow.left, NULL);
+                    REGION_MirrorRegion(prgnDest, prgnDest, GetPDCWidth(pdc), NULL);
             }
 
             if ((ret == 1) && (iCode == SYSRGN))

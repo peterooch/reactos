@@ -178,7 +178,7 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
     {
         FLOATOBJ temp;
 
-        FLOATOBJ_SetLong(&temp,pdc->erclWindow.right - pdc->erclWindow.left - 1);
+        FLOATOBJ_SetLong(&temp, GetPDCWidth(pdc) - 1);
         FLOATOBJ_Sub(&temp, &pmx->efDx);
         
         pmx->efDx =  temp;

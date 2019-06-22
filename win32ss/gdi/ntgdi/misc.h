@@ -138,3 +138,7 @@ HBITMAP NTAPI UserLoadImage(PCWSTR);
 
 BOOL NTAPI W32kDosPathNameToNtPathName(PCWSTR, PUNICODE_STRING);
 
+#define GetPDCWidth(pdc) (pdc->erclWindow.right - pdc->erclWindow.left)
+#define IsMirroredPDC(pdc) (pdc->pdcattr->dwLayout & LAYOUT_RTL)
+#define IsMirroredPWND(pwnd) (pwnd->ExStyle & WS_EX_LAYOUTRTL)
+#define GetRECTWidth(rect) (rect.right - rect.left)

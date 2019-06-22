@@ -191,7 +191,7 @@ IntSelectClipRgn(
             /* this should work */
             if (mirrored)
             {
-                REGION_MirrorRegion(mirrored, prgn, pdc->erclWindow.right - pdc->erclWindow.left, NULL);
+                REGION_MirrorRegion(mirrored, prgn, GetPDCWidth(dc), NULL);
                 REGION_CopyRegion(prgn, mirrored);
                 REGION_Delete(mirrored);
             }
