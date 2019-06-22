@@ -763,6 +763,13 @@ NtGdiGetRandomRgn(
         if (prgnDest)
         {
             ret = IntGdiCombineRgn(prgnDest, prgnSrc, 0, RGN_COPY) == ERROR ? -1 : 1;
+
+            if (iCode == CLIPRGN || iCode == METARGN)
+            {
+                if (pdc->pdcattr->dwLayout & LAYOUT_RTL)
+                    REGION_MirrorRegion(prgnDest, prgnDest, pdc->erclWindow.right - pdc->erclWindow.left, NULL);
+            }
+
             if ((ret == 1) && (iCode == SYSRGN))
             {
                 /// \todo FIXME This is not really correct, since we already modified the region

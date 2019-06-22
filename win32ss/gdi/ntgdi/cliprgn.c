@@ -183,6 +183,20 @@ IntSelectClipRgn(
         }
         return SIMPLEREGION;
     }
+    else
+    {   
+        if (dc->pdcattr->dwLayout & LAYOUT_RTL)
+        {
+            PREGION mirrored = IntSysCreateRectpRgn(0, 0, 0, 0);
+            /* this should work */
+            if (mirrored)
+            {
+                REGION_MirrorRegion(mirrored, prgn, pdc->erclWindow.right - pdc->erclWindow.left, NULL);
+                REGION_CopyRegion(prgn, mirrored);
+                REGION_Delete(mirrored);
+            }
+        }
+    }
 
     //
     // Combine the new Clip region with original Clip and caller Region.
@@ -389,6 +403,13 @@ GdiGetClipBox(
         iComplexity = REGION_GetRgnBox(pdc->prgnVis, prc);
     }
 
+    if (pdc->pdcattr->dwLayout & LAYOUT_RTL)
+    {
+        INT temp = prc->left;
+        prc->left = prc->right - 1;
+        prc->right = temp - 1;
+    }
+
     /* Unlock the DC */
     DC_UnlockDc(pdc);
 
@@ -588,6 +609,7 @@ NtGdiOffsetClipRgn(
     {
         /* Convert coordinates into device space. Note that we need to convert
            2 coordinates to account for rotation / shear / offset */
+        /* wine does this differently */
         apt[0].x = 0;
         apt[0].y = 0;
         apt[1].x = xOffset;
