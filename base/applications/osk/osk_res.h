@@ -52,6 +52,7 @@
 
 #define STRING_OSK                          500
 #define STRING_AUTHORS                      501
+#define STRING_FONT                         502
 
 #define IDC_STATIC                          -1
 
