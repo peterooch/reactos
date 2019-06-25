@@ -15,6 +15,44 @@
 
 OSK_GLOBALS Globals;
 
+/* For use by OSK_SetKeys() */
+const UINT Keys[] = {
+    SCAN_CODE_17, // Q
+    SCAN_CODE_18, // W
+    SCAN_CODE_19, // E
+    SCAN_CODE_20, // R
+    SCAN_CODE_21, // T
+    SCAN_CODE_22, // Y
+    SCAN_CODE_23, // U
+    SCAN_CODE_24, // I
+    SCAN_CODE_25, // O
+    SCAN_CODE_26, // P
+    SCAN_CODE_27, // [
+    SCAN_CODE_28, // ]
+    SCAN_CODE_29, // '\\'
+    SCAN_CODE_31, // A
+    SCAN_CODE_32, // S
+    SCAN_CODE_33, // D
+    SCAN_CODE_34, // F
+    SCAN_CODE_35, // G
+    SCAN_CODE_36, // H
+    SCAN_CODE_37, // J
+    SCAN_CODE_38, // K
+    SCAN_CODE_39, // L
+    SCAN_CODE_40, // ';'
+    SCAN_CODE_41, // '\''
+    SCAN_CODE_46, // Z
+    SCAN_CODE_47, // X
+    SCAN_CODE_48, // C
+    SCAN_CODE_49, // V
+    SCAN_CODE_50, // B
+    SCAN_CODE_51, // N
+    SCAN_CODE_52, // M
+    SCAN_CODE_53, // ','
+    SCAN_CODE_54, // '.'
+    SCAN_CODE_55, // '/'
+};
+
 /* Functions */
 int OSK_SetImage(int IdDlgItem, int IdResource);
 int OSK_DlgInitDialog(HWND hDlg);
@@ -126,6 +164,27 @@ VOID OSK_About(VOID)
     DestroyIcon(OSKIcon);
 }
 
+/***********************************************************************
+ *  OSK_SetKeys
+ *
+ *  Pull data from currently active keyboard state
+ *  to place the currect characters.
+ */
+void OSK_SetKeys(HWND hDlg)
+{
+    UINT i, uVirtKey;
+    BYTE lpKeyStates[256];
+    WCHAR wKey[2] = {0};
+
+    GetKeyboardState(lpKeyStates);
+
+    for (i = 0; i < ARRAYSIZE(Keys); i++)
+    {
+        uVirtKey = MapVirtualKeyW(Keys[i] & 0xFF, MAPVK_VSC_TO_VK);
+        ToUnicode(uVirtKey, Keys[i] & 0xFF, lpKeyStates, wKey, 2, 0);
+        SetDlgItemTextW(hDlg, Keys[i], wKey);
+    }
+}
 
 /***********************************************************************
  *
@@ -140,6 +199,8 @@ int OSK_DlgInitDialog(HWND hDlg)
     MONITORINFO info;
     POINT Pt;
     RECT rcWindow, rcDlgIntersect;
+    WCHAR szCaption[MAX_PATH];
+    LOGFONTW logfont = {0};
 
     /* Save handle */
     Globals.hMainWnd = hDlg;
@@ -172,6 +233,31 @@ int OSK_DlgInitDialog(HWND hDlg)
         /* Set the window icons (they are deleted when the process terminates) */
         SendMessageW(Globals.hMainWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
         SendMessageW(Globals.hMainWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIconSm);
+    }
+
+    if (!Globals.hMainDlgFont)
+    {
+        /* Load font */
+        if (!LoadStringW(Globals.hInstance, STRING_FONT, logfont.lfFaceName, LF_FACESIZE))
+        {
+            StringCchCopyW(logfont.lfFaceName, LF_FACESIZE, L"MS Shell Dlg");
+        }
+
+        Globals.hMainDlgFont = CreateFontIndirect(&logfont);
+    }
+
+    if (Globals.hMainDlgFont)
+    {
+        SendMessageW(hDlg, WM_SETFONT, 0, (LPARAM)Globals.hMainDlgFont);
+    }
+
+    /* Set keys */
+    OSK_SetKeys(hDlg);
+
+    /* Load caption, default one is in dialog resource */
+    if (LoadStringW(Globals.hInstance, STRING_OSK, szCaption, MAX_PATH))
+    {
+        SetWindowTextW(hDlg, szCaption);
     }
 
     /* Get screen info */
@@ -263,6 +349,7 @@ int OSK_DlgClose(void)
 
     /* delete GDI objects */
     if (Globals.hBrushGreenLed) DeleteObject(Globals.hBrushGreenLed);
+    if (Globals.hMainDlgFont) DeleteObject(Globals.hMainDlgFont);
 
     /* Save the settings to the registry hive */
     SaveDataToRegistry();
@@ -574,18 +661,9 @@ INT_PTR APIENTRY OSK_DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
                             Set the member value as TRUE, destroy the dialog and save the data configuration into the registry.
                         */
                         Globals.bIsEnhancedKeyboard = TRUE;
-                        EndDialog(hDlg, FALSE);
                         SaveDataToRegistry();
-
-                        /* Change the condition of enhanced keyboard item menu to checked */
-                        CheckMenuItem(GetMenu(hDlg), IDM_ENHANCED_KB, MF_BYCOMMAND | MF_CHECKED);
-                        CheckMenuItem(GetMenu(hDlg), IDM_STANDARD_KB, MF_BYCOMMAND | MF_UNCHECKED);
-
-                        /* Finally, display the dialog modal box with the enhanced keyboard dialog */
-                        DialogBoxW(Globals.hInstance,
-                                   MAKEINTRESOURCEW(MAIN_DIALOG_ENHANCED_KB),
-                                   GetDesktopWindow(),
-                                   OSK_DlgProc);
+                        /* Send TRUE to signal that we want to to recreate the main dialog */
+                        EndDialog(hDlg, TRUE);
                     }
 
                     break;
@@ -600,18 +678,9 @@ INT_PTR APIENTRY OSK_DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
                             Set the member value as FALSE, destroy the dialog and save the data configuration into the registry.
                         */
                         Globals.bIsEnhancedKeyboard = FALSE;
-                        EndDialog(hDlg, FALSE);
                         SaveDataToRegistry();
-
-                        /* Change the condition of standard keyboard item menu to checked */
-                        CheckMenuItem(GetMenu(hDlg), IDM_ENHANCED_KB, MF_BYCOMMAND | MF_UNCHECKED);
-                        CheckMenuItem(GetMenu(hDlg), IDM_STANDARD_KB, MF_BYCOMMAND | MF_CHECKED);
-
-                        /* Finally, display the dialog modal box with the standard keyboard dialog */
-                        DialogBoxW(Globals.hInstance,
-                                   MAKEINTRESOURCEW(MAIN_DIALOG_STANDARD_KB),
-                                   GetDesktopWindow(),
-                                   OSK_DlgProc);
+                        /* Send TRUE to signal that we want to to recreate the main dialog */
+                        EndDialog(hDlg, TRUE);
                     }
 
                     break;
@@ -720,21 +789,21 @@ int WINAPI wWinMain(HINSTANCE hInstance,
         DialogBoxW(Globals.hInstance, MAKEINTRESOURCEW(IDD_WARNINGDIALOG_OSK), Globals.hMainWnd, OSK_WarningProc);
     }
 
-    /* Before initializing the dialog execution, check if the chosen keyboard type is standard or enhanced */
-    if (Globals.bIsEnhancedKeyboard)
-    {
-        LayoutResource = MAIN_DIALOG_ENHANCED_KB;
-    }
-    else
-    {
-        LayoutResource = MAIN_DIALOG_STANDARD_KB;
-    }
-
-    /* Create the modal box based on the configuration registry */
-    DialogBoxW(hInstance,
-               MAKEINTRESOURCEW(LayoutResource),
-               GetDesktopWindow(),
-               OSK_DlgProc);
+    do {
+        /* Before (re)initializing the dialog execution, check if the chosen keyboard type is standard or enhanced */
+        if (Globals.bIsEnhancedKeyboard)
+        {
+            LayoutResource = MAIN_DIALOG_ENHANCED_KB;
+        }
+        else
+        {
+            LayoutResource = MAIN_DIALOG_STANDARD_KB;
+        }
+    /* (Re)Create the modal box based on the configuration registry */
+    } while (DialogBoxW(hInstance,
+                        MAKEINTRESOURCEW(LayoutResource),
+                        GetDesktopWindow(),
+                        OSK_DlgProc) != FALSE);
 
     /* Delete the mutex */
     if (hMutex)

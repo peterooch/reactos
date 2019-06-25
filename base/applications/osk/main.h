@@ -20,6 +20,7 @@ typedef struct
     HINSTANCE  hInstance;
     HWND       hMainWnd;
     HBRUSH     hBrushGreenLed;
+    HFONT      hMainDlgFont;
     UINT_PTR   iTimer;
     /* FIXME: To be deleted when ReactOS will support WS_EX_NOACTIVATE */
     HWND       hActiveWnd;

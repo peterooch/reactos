@@ -18,6 +18,7 @@
 #include <debug.h>
 #include <uxtheme.h>
 #include <vsstyle.h>
+#include <strsafe.h>
 
 #include "main.h"
 
