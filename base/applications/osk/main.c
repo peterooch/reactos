@@ -10,6 +10,11 @@
 
 #include "precomp.h"
 
+//(re)move me
+#define STRING_FONT 0
+#define KB_NORMAL_CX 570
+#define KB_ENHANCED_CX 700
+#define KB_NORMAL_CY 250
 /* GLOBALS ********************************************************************/
 
 OSK_GLOBALS Globals;
@@ -23,32 +28,60 @@ OSK_KEYLEDINDICATOR LedKey[] =
 
 /* FUNCTIONS ******************************************************************/
 
-/***********************************************************************
- *
- *           OSK_SetImage
- *
- *  Set an image on a button
- */
-int OSK_SetImage(int IdDlgItem, int IdResource)
+BOOL OSK_CreateWindow()
 {
-    HICON hIcon;
-    HWND hWndItem;
+    HWND hwnd;
+    WNDCLASSEXW wc = { 0 };
 
-    hIcon = (HICON)LoadImageW(Globals.hInstance, MAKEINTRESOURCEW(IdResource),
-                              IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-    if (hIcon == NULL)
+    Globals.hIcon = LoadIconW(Globals.hInstance, MAKEINTRESOURCEW(IDI_OSK));
+
+    if (!LoadStringW(Globals.hInstance, STRING_OSK, Globals.szCaption, MAX_PATH))
+        StringCchCopyW(Globals.szCaption, MAX_PATH, L"On screen keyboard");
+
+    wc.lpfnWndProc   = OSK_WndProc;
+    wc.hInstance     = Globals.hInstance;
+    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wc.lpszClassName = L"OSKMainWindow";
+    wc.lpszMenuName  = MAKEINTRESOURCEW(IDR_OSK_MENU);
+    wc.cbSize        = sizeof(WNDCLASSEXW);
+    wc.hIcon         = Globals.hIcon;
+    wc.hIconSm       = (HICON)CopyImage(Globals.hIcon, IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
+                                        GetSystemMetrics(SM_CYSMICON), LR_COPYFROMRESOURCE);
+    if (!RegisterClassExW(&wc))
         return FALSE;
 
-    hWndItem = GetDlgItem(Globals.hMainWnd, IdDlgItem);
-    if (hWndItem == NULL)
+    /* Load the settings from the registry hive */
+    LoadDataFromRegistry();
+
+    /* Choose dimensions for the main window */
+    if (Globals.bIsEnhancedKeyboard)
     {
-        DestroyIcon(hIcon);
-        return FALSE;
+        Globals.DimX = KB_ENHANCED_CX;
+        Globals.DimY = KB_NORMAL_CY;
+    }
+    else
+    {
+        Globals.DimX = KB_NORMAL_CX;
+        Globals.DimY = KB_NORMAL_CY;
     }
 
-    SendMessageW(hWndItem, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)hIcon);
+    hwnd = CreateWindowExW(WS_EX_TOPMOST | WS_EX_NOACTIVATE | WS_EX_APPWINDOW,
+                           L"OSKMainWindow",
+                           Globals.szCaption,
+                           WS_SYSMENU | WS_MINIMIZEBOX,
+                           Globals.PosX,
+                           Globals.PosY,
+                           Globals.DimX,
+                           Globals.DimY,
+                           NULL,
+                           NULL,
+                           Globals.hInstance,
+                           NULL);
+    if (!hwnd)
+        return FALSE;
 
-    /* The system automatically deletes these resources when the process that created them terminates (MSDN) */
+    ShowWindow(hwnd, SW_SHOW);
+    UpdateWindow(hwnd);
 
     return TRUE;
 }
@@ -81,7 +114,6 @@ INT_PTR CALLBACK OSK_WarningProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
                 }
 
                 case IDOK:
-                case IDCANCEL:
                 {
                     EndDialog(hDlg, LOWORD(wParam));
                     return TRUE;
@@ -100,7 +132,7 @@ INT_PTR CALLBACK OSK_WarningProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
  *
  *  Initializes the "About" dialog box
  */
-VOID OSK_About(VOID)
+VOID OSK_About(HWND hwnd)
 {
     WCHAR szTitle[MAX_BUFF];
     WCHAR szAuthors[MAX_BUFF];
@@ -114,58 +146,49 @@ VOID OSK_About(VOID)
     LoadStringW(Globals.hInstance, STRING_AUTHORS, szAuthors, countof(szAuthors));
 
     /* Finally, execute the "About" dialog by using the Shell routine */
-    ShellAboutW(Globals.hMainWnd, szTitle, szAuthors, OSKIcon);
+    ShellAboutW(hwnd, szTitle, szAuthors, OSKIcon);
 
     /* Once done, destroy the icon */
     DestroyIcon(OSKIcon);
 }
 
-
 /***********************************************************************
  *
- *           OSK_DlgInitDialog
+ *           OSK_Create
  *
- *  Handling of WM_INITDIALOG
+ *  Handling of WM_CREATE
  */
-int OSK_DlgInitDialog(HWND hDlg)
+LRESULT OSK_Create(HWND hwnd)
 {
-    HICON hIcon, hIconSm;
     HMONITOR monitor;
     MONITORINFO info;
     POINT Pt;
-    RECT rcWindow, rcDlgIntersect;
+    RECT rcWindow, rcIntersect;
 
-    /* Save handle */
-    Globals.hMainWnd = hDlg;
+    /* If the member of the struct (bShowWarning) is set then display the dialog box */
+    if (Globals.bShowWarning)
+    {
+        DialogBoxW(Globals.hInstance, MAKEINTRESOURCEW(IDD_WARNINGDIALOG_OSK), hwnd, OSK_WarningProc);
+    }
 
     /* Check the checked menu item before displaying the modal box */
     if (Globals.bIsEnhancedKeyboard)
     {
         /* Enhanced keyboard dialog chosen, set the respective menu item as checked */
-        CheckMenuItem(GetMenu(hDlg), IDM_ENHANCED_KB, MF_BYCOMMAND | MF_CHECKED);
-        CheckMenuItem(GetMenu(hDlg), IDM_STANDARD_KB, MF_BYCOMMAND | MF_UNCHECKED);
+        CheckMenuItem(GetMenu(hwnd), IDM_ENHANCED_KB, MF_BYCOMMAND | MF_CHECKED);
+        CheckMenuItem(GetMenu(hwnd), IDM_STANDARD_KB, MF_BYCOMMAND | MF_UNCHECKED);
     }
     else
     {
         /* Standard keyboard dialog chosen, set the respective menu item as checked */
-        CheckMenuItem(GetMenu(hDlg), IDM_STANDARD_KB, MF_BYCOMMAND | MF_CHECKED);
-        CheckMenuItem(GetMenu(hDlg), IDM_ENHANCED_KB, MF_BYCOMMAND | MF_UNCHECKED);
+        CheckMenuItem(GetMenu(hwnd), IDM_STANDARD_KB, MF_BYCOMMAND | MF_CHECKED);
+        CheckMenuItem(GetMenu(hwnd), IDM_ENHANCED_KB, MF_BYCOMMAND | MF_UNCHECKED);
     }
 
     /* Check if the "Click Sound" option was chosen before (and if so, then tick the menu item) */
     if (Globals.bSoundClick)
     {
-        CheckMenuItem(GetMenu(hDlg), IDM_CLICK_SOUND, MF_BYCOMMAND | MF_CHECKED);
-    }
-
-    /* Set the application's icon */
-    hIcon = LoadImageW(Globals.hInstance, MAKEINTRESOURCEW(IDI_OSK), IMAGE_ICON, 0, 0, LR_SHARED | LR_DEFAULTSIZE);
-    hIconSm = CopyImage(hIcon, IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_COPYFROMRESOURCE);
-    if (hIcon || hIconSm)
-    {
-        /* Set the window icons (they are deleted when the process terminates) */
-        SendMessageW(Globals.hMainWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-        SendMessageW(Globals.hMainWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIconSm);
+        CheckMenuItem(GetMenu(hwnd), IDM_CLICK_SOUND, MF_BYCOMMAND | MF_CHECKED);
     }
 
     /* Get screen info */
@@ -173,7 +196,7 @@ int OSK_DlgInitDialog(HWND hDlg)
     monitor = MonitorFromPoint(Pt, MONITOR_DEFAULTTOPRIMARY);
     info.cbSize = sizeof(info);
     GetMonitorInfoW(monitor, &info);
-    GetWindowRect(hDlg, &rcWindow);
+    GetWindowRect(hwnd, &rcWindow);
 
     /*
         If the coordination values are default then re-initialize using the specific formulas
@@ -189,7 +212,7 @@ int OSK_DlgInitDialog(HWND hDlg)
         Calculate the intersection of two rectangle sources (dialog and work desktop area).
         If such sources do not intersect, then the dialog is deemed as "off screen".
     */
-    if (IntersectRect(&rcDlgIntersect, &rcWindow, &info.rcWork) == 0)
+    if (IntersectRect(&rcIntersect, &rcWindow, &info.rcWork) == 0)
     {
         Globals.PosX = (info.rcMonitor.left + info.rcMonitor.right - (rcWindow.right - rcWindow.left)) / 2;
         Globals.PosY = info.rcMonitor.bottom - (rcWindow.bottom - rcWindow.top);
@@ -206,6 +229,9 @@ int OSK_DlgInitDialog(HWND hDlg)
             Globals.PosY = info.rcMonitor.bottom - (rcWindow.bottom - rcWindow.top);
         }
     }
+    /* Create keyboard child window */
+    if (!OSK_KeyboardCreate(hwnd))
+        return -1;
 
     /*
         Place the window (with respective placement coordinates) as topmost, above
@@ -251,40 +277,26 @@ int OSK_DlgInitDialog(HWND hDlg)
 
 /***********************************************************************
  *
- *           OSK_RestoreDlgPlacement
- *
- *  Restores the dialog placement
- */
-VOID OSK_RestoreDlgPlacement(HWND hDlg)
-{
-    LoadSettings();
-    SetWindowPos(hDlg, (Globals.bAlwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST), Globals.PosX, Globals.PosY, 0, 0, SWP_NOSIZE);
-}
-
-/***********************************************************************
- *
- *           OSK_DlgClose
+ *           OSK_Close
  *
  *  Handling of WM_CLOSE
  */
-int OSK_DlgClose(void)
+int OSK_Close(HWND hwnd)
 {
-    KillTimer(Globals.hMainWnd, Globals.iTimer);
+    KillTimer(hwnd, Globals.iTimer);
 
-    /* Release Ctrl, Shift, Alt keys */
-    OSK_ReleaseKey(SCAN_CODE_44); // Left shift
-    OSK_ReleaseKey(SCAN_CODE_57); // Right shift
-    OSK_ReleaseKey(SCAN_CODE_58); // Left ctrl
-    OSK_ReleaseKey(SCAN_CODE_60); // Left alt
-    OSK_ReleaseKey(SCAN_CODE_62); // Right alt
-    OSK_ReleaseKey(SCAN_CODE_64); // Right ctrl
+    /* Save the settings to the registry hive */
+    SaveDataToRegistry(hwnd);
+
+    DestroyWindow(hwnd);
 
     /* delete GDI objects */
-    if (Globals.hBrushGreenLed) DeleteObject(Globals.hBrushGreenLed);
+    if (Globals.hBrushGreenLed)
+        DeleteObject(Globals.hBrushGreenLed);
+    if (Globals.hFont)
+        DeleteObject(Globals.hFont);
 
-    /* Save the application's settings on registry */
-    SaveSettings();
-
+    PostQuitMessage(0);
     return TRUE;
 }
 
@@ -317,13 +329,13 @@ VOID OSK_RefreshLEDKeys(VOID)
  *
  *  Handling of WM_TIMER
  */
-int OSK_DlgTimer(void)
+int OSK_Timer(HWND hwnd)
 {
     /* FIXME: To be deleted when ReactOS will support WS_EX_NOACTIVATE */
     HWND hWndActiveWindow;
 
     hWndActiveWindow = GetForegroundWindow();
-    if (hWndActiveWindow != NULL && hWndActiveWindow != Globals.hMainWnd)
+    if (hWndActiveWindow != NULL && hWndActiveWindow != hwnd)
     {
         Globals.hActiveWnd = hWndActiveWindow;
     }
@@ -339,11 +351,11 @@ int OSK_DlgTimer(void)
 
 /***********************************************************************
  *
- *           OSK_DlgCommand
+ *           OSK_Command
  *
- *  All handling of dialog command
+ *  All handling of commands
  */
-BOOL OSK_DlgCommand(WPARAM wCommand, HWND hWndControl)
+BOOL OSK_Command(WPARAM wCommand, HWND hWndControl)
 {
     WORD ScanCode;
     INPUT Input;
@@ -367,8 +379,7 @@ BOOL OSK_DlgCommand(WPARAM wCommand, HWND hWndControl)
     }
 
     /* KeyDown and/or KeyUp ? */
-    WindowStyle = GetWindowLongW(hWndControl, GWL_STYLE);
-    if ((WindowStyle & BS_AUTOCHECKBOX) == BS_AUTOCHECKBOX)
+    if ((GetWindowLongPtrW(hWndControl, GWL_STYLE) & BS_AUTOCHECKBOX) == BS_AUTOCHECKBOX)
     {
         /* 2-states key like Shift, Alt, Ctrl, ... */
         if (SendMessageW(hWndControl, BM_GETCHECK, 0, 0) == BST_CHECKED)
@@ -452,17 +463,16 @@ BOOL OSK_DlgCommand(WPARAM wCommand, HWND hWndControl)
  *
  *  Release the key of ID wCommand
  */
-BOOL OSK_ReleaseKey(WORD ScanCode)
+BOOL OSK_ReleaseKey(HWND hwnd, WORD ScanCode)
 {
     INPUT Input;
     BOOL bExtendedKey;
-    LONG WindowStyle;
     HWND hWndControl;
 
+    hWndControl = GetDlgItem(hwnd, ScanCode);
+
     /* Is it a 2-states key ? */
-    hWndControl = GetDlgItem(Globals.hMainWnd, ScanCode);
-    WindowStyle = GetWindowLongW(hWndControl, GWL_STYLE);
-    if ((WindowStyle & BS_AUTOCHECKBOX) != BS_AUTOCHECKBOX) return FALSE;
+    if ((GetWindowLongPtrW(hWndControl, GWL_STYLE) & BS_AUTOCHECKBOX) != BS_AUTOCHECKBOX) return FALSE;
 
     /* Is the key down ? */
     if (SendMessageW(hWndControl, BM_GETCHECK, 0, 0) != BST_CHECKED) return TRUE;
@@ -489,143 +499,36 @@ BOOL OSK_ReleaseKey(WORD ScanCode)
 
 /***********************************************************************
  *
- *           OSK_ThemeHandler
- *
- *  Function helper which handles theme drawing of controls
+ *       OSK_WndProc
  */
-LRESULT APIENTRY OSK_ThemeHandler(HWND hDlg, NMCUSTOMDRAW *pNmDraw)
-{
-    HTHEME hTheme;
-    HWND hDlgButtonCtrl;
-    LRESULT Ret;
-    INT iState = PBS_NORMAL;
-
-    /* Retrieve the theme handle for the button controls */
-    hDlgButtonCtrl = pNmDraw->hdr.hwndFrom;
-    hTheme = GetWindowTheme(hDlgButtonCtrl);
-
-    /*
-        Begin the painting procedures if we retrieved
-        the theme for control buttons of the dialog.
-    */
-    if (hTheme)
-    {
-        /* Obtain CDDS drawing stages */
-        switch (pNmDraw->dwDrawStage)
-        {
-            case CDDS_PREPAINT:
-            {
-                /*
-                    The button could be either in normal state or pushed.
-                    Retrieve its state and save to a variable.
-                */
-                if (pNmDraw->uItemState & CDIS_DEFAULT)
-                {
-                    iState = PBS_DEFAULTED;
-                }
-                else if (pNmDraw->uItemState & CDIS_SELECTED)
-                {
-                    iState = PBS_PRESSED;
-                }
-                else if (pNmDraw->uItemState & CDIS_HOT)
-                {
-                    iState = PBS_HOT;
-                }
-
-                if (IsThemeBackgroundPartiallyTransparent(hTheme, BP_PUSHBUTTON, iState))
-                {
-                    /* Draw the application if the theme is transparent */
-                    DrawThemeParentBackground(hDlgButtonCtrl, pNmDraw->hdc, &pNmDraw->rc);
-                }
-
-                /* Draw it */
-                DrawThemeBackground(hTheme, pNmDraw->hdc, BP_PUSHBUTTON, iState, &pNmDraw->rc, NULL);
-
-                Ret = CDRF_SKIPDEFAULT;
-                break;
-            }
-
-            case CDDS_PREERASE:
-            {
-                Ret = CDRF_DODEFAULT;
-                break;
-            }
-
-            default:
-                Ret = CDRF_SKIPDEFAULT;
-                break;
-        }
-    }
-    else
-    {
-        /* hTheme is NULL so bail right away */
-        Ret = CDRF_DODEFAULT;
-    }
-
-    return Ret;
-}
-
-/***********************************************************************
- *
- *       OSK_DlgProc
- */
-INT_PTR APIENTRY OSK_DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT APIENTRY OSK_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
-        case WM_INITDIALOG:
-            OSK_DlgInitDialog(hDlg);
+        case WM_CREATE:
+        {
+            return OSK_Create(hwnd);
+        }
+        case WM_PAINT:
+        {
+            ShowWindow(Globals.hKeyboardWnd, SW_SHOW);
+            UpdateWindow(Globals.hKeyboardWnd);
             return TRUE;
-
-        case WM_TIMER:
-            OSK_DlgTimer();
-            return TRUE;
-
-        case WM_NOTIFY:
-            return OSK_ThemeHandler(hDlg, (LPNMCUSTOMDRAW)lParam);
-
-        case WM_CTLCOLORSTATIC:
-            if ((HWND)lParam == GetDlgItem(hDlg, IDC_LED_NUM))
-            {
-                if (GetKeyState(VK_NUMLOCK) & 0x0001)
-                    return (INT_PTR)Globals.hBrushGreenLed;
-                else
-                    return (INT_PTR)GetStockObject(BLACK_BRUSH);
-            }
-            if ((HWND)lParam == GetDlgItem(hDlg, IDC_LED_CAPS))
-            {
-                if (GetKeyState(VK_CAPITAL) & 0x0001)
-                    return (INT_PTR)Globals.hBrushGreenLed;
-                else
-                    return (INT_PTR)GetStockObject(BLACK_BRUSH);
-            }
-            if ((HWND)lParam == GetDlgItem(hDlg, IDC_LED_SCROLL))
-            {
-                if (GetKeyState(VK_SCROLL) & 0x0001)
-                    return (INT_PTR)Globals.hBrushGreenLed;
-                else
-                    return (INT_PTR)GetStockObject(BLACK_BRUSH);
-            }
-            break;
-
+        }
         case WM_COMMAND:
+        {
             switch (LOWORD(wParam))
             {
-                case IDCANCEL:
-                {
-                    EndDialog(hDlg, FALSE);
-                    break;
-                }
-
                 case IDM_EXIT:
                 {
-                    EndDialog(hDlg, FALSE);
-                    break;
+                    /* Quickly post a WM_CLOSE message */
+                    return PostMessageW(hwnd, WM_CLOSE, 0, 0);
                 }
-
                 case IDM_ENHANCED_KB:
+                case IDM_STANDARD_KB:
                 {
-                    if (!Globals.bIsEnhancedKeyboard)
+                    if ((LOWORD(wParam) == IDM_ENHANCED_KB && Globals.bIsEnhancedKeyboard) ||
+                        (LOWORD(wParam) == IDM_STANDARD_KB && !Globals.bIsEnhancedKeyboard))
                     {
                         /*
                             The user attempted to switch to enhanced keyboard dialog type.
@@ -653,42 +556,26 @@ INT_PTR APIENTRY OSK_DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
                                    OSK_DlgProc);
                     }
 
-                    break;
-                }
+                    /* Switch layout info */
+                    Globals.bIsEnhancedKeyboard = !Globals.bIsEnhancedKeyboard;
+                    CheckMenuItem(GetMenu(hwnd), IDM_STANDARD_KB, MF_BYCOMMAND | (!Globals.bIsEnhancedKeyboard ? MF_CHECKED : MF_UNCHECKED));
+                    CheckMenuItem(GetMenu(hwnd), IDM_ENHANCED_KB, MF_BYCOMMAND | (Globals.bIsEnhancedKeyboard ? MF_CHECKED : MF_UNCHECKED));
 
-                case IDM_STANDARD_KB:
-                {
                     if (Globals.bIsEnhancedKeyboard)
                     {
-                        /*
-                            The user attempted to switch to standard keyboard dialog type.
-                            Set the member value as FALSE, destroy the dialog and save the data configuration into the registry.
-                        */
-                        Globals.bIsEnhancedKeyboard = FALSE;
-                        EndDialog(hDlg, FALSE);
-                        SaveSettings();
-
-                        /* Change the condition of standard keyboard item menu to checked */
-                        CheckMenuItem(GetMenu(hDlg), IDM_ENHANCED_KB, MF_BYCOMMAND | MF_UNCHECKED);
-                        CheckMenuItem(GetMenu(hDlg), IDM_STANDARD_KB, MF_BYCOMMAND | MF_CHECKED);
-
-                        /*
-                            Before creating the dialog box restore the coordinates. The user can
-                            move the dialog around before choosing a different dialog layout therefore
-                            we must create the dialog with the new coordinates.
-                        */
-                        OSK_RestoreDlgPlacement(hDlg);
-
-                        /* Finally, display the dialog modal box with the standard keyboard dialog */
-                        DialogBoxW(Globals.hInstance,
-                                   MAKEINTRESOURCEW(MAIN_DIALOG_STANDARD_KB),
-                                   GetDesktopWindow(),
-                                   OSK_DlgProc);
+                        Globals.DimX = KB_ENHANCED_CX;
+                        Globals.DimY = KB_NORMAL_CY;
                     }
-
-                    break;
+                    else
+                    {
+                        Globals.DimX = KB_NORMAL_CX;
+                        Globals.DimY = KB_NORMAL_CY;
+                    }
+                    /* Resize Window */
+                    SetWindowPos(hwnd, HWND_TOP, 0, 0, Globals.DimX, Globals.DimY, SWP_NOMOVE);
+                    InvalidateRect(hwnd, NULL, FALSE);
+                    return TRUE;
                 }
-
                 case IDM_CLICK_SOUND:
                 {
                     /*
@@ -698,62 +585,33 @@ INT_PTR APIENTRY OSK_DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
                     if (!Globals.bSoundClick)
                     {
                         Globals.bSoundClick = TRUE;
-                        CheckMenuItem(GetMenu(hDlg), IDM_CLICK_SOUND, MF_BYCOMMAND | MF_CHECKED);
+                        CheckMenuItem(GetMenu(hwnd), IDM_CLICK_SOUND, MF_BYCOMMAND | MF_CHECKED);
                     }
                     else
                     {
                         Globals.bSoundClick = FALSE;
-                        CheckMenuItem(GetMenu(hDlg), IDM_CLICK_SOUND, MF_BYCOMMAND | MF_UNCHECKED);
+                        CheckMenuItem(GetMenu(hwnd), IDM_CLICK_SOUND, MF_BYCOMMAND | MF_UNCHECKED);
                     }
-
-                    break;
+                    return TRUE;
                 }
-
-                case IDM_ON_TOP:
-                {
-                    /*
-                        Check the condition state before disabling/enabling the menu
-                        item and change the topmost order.
-                    */
-                    if (!Globals.bAlwaysOnTop)
-                    {
-                        Globals.bAlwaysOnTop = TRUE;
-                        CheckMenuItem(GetMenu(hDlg), IDM_ON_TOP, MF_BYCOMMAND | MF_CHECKED);
-                        SetWindowPos(hDlg, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-                    }
-                    else
-                    {
-                        Globals.bAlwaysOnTop = FALSE;
-                        CheckMenuItem(GetMenu(hDlg), IDM_ON_TOP, MF_BYCOMMAND | MF_UNCHECKED);
-                        SetWindowPos(hDlg, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-                    }
-
-                    break;
-                }
-
                 case IDM_ABOUT:
                 {
-                    OSK_About();
-                    break;
+                    OSK_About(hwnd);
+                    return TRUE;
                 }
-
-                default:
-                    OSK_DlgCommand(wParam, (HWND)lParam);
-                    break;
             }
             break;
-
-        case WM_THEMECHANGED:
-            /* Redraw the dialog (and its control buttons) using the new theme */
-            InvalidateRect(hDlg, NULL, FALSE);
-            break;
-
+        }
+        case WM_TIMER:
+        {
+            return OSK_Timer(hwnd);
+        }
         case WM_CLOSE:
-            OSK_DlgClose();
-            break;
+        {
+            return OSK_Close(hwnd);
+        }
     }
-
-    return 0;
+    return DefWindowProcW(hwnd, msg, wParam, lParam);
 }
 
 /***********************************************************************
@@ -767,8 +625,8 @@ int WINAPI wWinMain(HINSTANCE hInstance,
 {
     HANDLE hMutex;
     DWORD dwError;
-    INT LayoutResource;
     INITCOMMONCONTROLSEX iccex;
+    MSG msg;
 
     UNREFERENCED_PARAMETER(prev);
     UNREFERENCED_PARAMETER(cmdline);
@@ -780,16 +638,15 @@ int WINAPI wWinMain(HINSTANCE hInstance,
     */
     hMutex = CreateMutexW(NULL, FALSE, L"OSKRunning");
 
+    /* Check if there's already a mutex for the program */
     if (hMutex)
     {
-        /* Check if there's already a mutex for the program */
         dwError = GetLastError();
-
         if (dwError == ERROR_ALREADY_EXISTS)
         {
             /*
-                A mutex with the object name has been created previously.
-                Therefore, another instance is already running.
+            A mutex with the object name has been created previously.
+            Therefore, another instance is already running.
             */
             DPRINT("wWinMain(): Failed to create a mutex! The program instance is already running.\n");
             CloseHandle(hMutex);
@@ -805,30 +662,16 @@ int WINAPI wWinMain(HINSTANCE hInstance,
     ZeroMemory(&Globals, sizeof(Globals));
     Globals.hInstance = hInstance;
 
-    /* Load the application's settings from the registry */
-    LoadSettings();
-
-    /* If the member of the struct (bShowWarning) is set then display the dialog box */
-    if (Globals.bShowWarning)
-    {
-        DialogBoxW(Globals.hInstance, MAKEINTRESOURCEW(IDD_WARNINGDIALOG_OSK), Globals.hMainWnd, OSK_WarningProc);
+    if (OSK_CreateWindow())
+    {   
+        while (GetMessageW(&msg, NULL, 0, 0))
+        {
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }       
+        UnregisterClassW(L"OSKMainWindow", Globals.hInstance);
+        UnregisterClassW(L"OSKKeyboard", Globals.hInstance);
     }
-
-    /* Before initializing the dialog execution, check if the chosen keyboard type is standard or enhanced */
-    if (Globals.bIsEnhancedKeyboard)
-    {
-        LayoutResource = MAIN_DIALOG_ENHANCED_KB;
-    }
-    else
-    {
-        LayoutResource = MAIN_DIALOG_STANDARD_KB;
-    }
-
-    /* Create the modal box based on the configuration registry */
-    DialogBoxW(hInstance,
-               MAKEINTRESOURCEW(LayoutResource),
-               GetDesktopWindow(),
-               OSK_DlgProc);
 
     /* Delete the mutex */
     if (hMutex)

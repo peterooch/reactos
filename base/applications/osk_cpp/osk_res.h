@@ -1,12 +1,10 @@
 /*
  * PROJECT:         ReactOS On-Screen Keyboard
  * LICENSE:         GPL - See COPYING in the top level directory
- * PURPOSE:         On-Screen Keyboard resource identifiers
- * COPYRIGHT:       Denis ROBERT
+ * FILE:            base/applications/osk/osk_res.h
+ * PURPOSE:         On screen keyboard.
+ * PROGRAMMERS:     Denis ROBERT
  */
-
-#define MAIN_DIALOG_ENHANCED_KB             2000
-#define MAIN_DIALOG_STANDARD_KB             2001
 
 #define IDI_SOUNDCLICK                      50
 
@@ -14,9 +12,6 @@
 #define IDC_LED_CAPS                        101
 #define IDC_LED_SCROLL                      102
 #define IDC_SHOWWARNINGCHECK                103
-#define IDC_TEXT_NUM                        104
-#define IDC_TEXT_CAPS                       105
-#define IDC_TEXT_SCROLL                     106
 
 #define IDI_OSK                             200
 #define IDI_BACK                            201
@@ -54,6 +49,7 @@
 
 #define STRING_OSK                          500
 #define STRING_AUTHORS                      501
+#define STRING_FONT                         502
 
 #define IDC_STATIC                          -1
 
