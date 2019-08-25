@@ -398,10 +398,6 @@ GetViewportOrgEx(
     lpPoint->x = pdcattr->ptlViewportOrg.x;
     lpPoint->y = pdcattr->ptlViewportOrg.y;
 
-    /* Handle right-to-left layout */
-    if (pdcattr->dwLayout & LAYOUT_RTL)
-        lpPoint->x = -lpPoint->x;
-
     return TRUE;
 }
 
@@ -425,10 +421,6 @@ GetWindowExtEx(
     /* Get the current window extension */
     lpSize->cx = pdcattr->szlWindowExt.cx;
     lpSize->cy = pdcattr->szlWindowExt.cy;
-
-    /* Handle right-to-left layout */
-    if (pdcattr->dwLayout & LAYOUT_RTL)
-        lpSize->cx = -lpSize->cx;
 
     return TRUE;
 }
@@ -513,10 +505,6 @@ SetViewportExtEx(
         pdcattr->szlViewportExt.cx = nXExtent;
         pdcattr->szlViewportExt.cy = nYExtent;
 
-        /* Handle right-to-left layout */
-        if (pdcattr->dwLayout & LAYOUT_RTL)
-            NtGdiMirrorWindowOrg(hdc);
-
         /* Update xform flags */
         pdcattr->flXform |= (PAGE_EXTENTS_CHANGED|INVALIDATE_ATTRIBUTES|DEVICE_TO_WORLD_INVALID);
     }
@@ -569,7 +557,6 @@ SetWindowOrgEx(
     pdcattr->ptlWindowOrg.y = Y;
 
     pdcattr->lWindowOrgx    = X;
-    if (pdcattr->dwLayout & LAYOUT_RTL) NtGdiMirrorWindowOrg(hdc);
     pdcattr->flXform |= (PAGE_XLATE_CHANGED|WORLD_XFORM_CHANGED|DEVICE_TO_WORLD_INVALID);
     return TRUE;
 
@@ -606,15 +593,10 @@ SetWindowExtEx(
         /* Return the current window extension */
         lpSize->cx = pdcattr->szlWindowExt.cx;
         lpSize->cy = pdcattr->szlWindowExt.cy;
-
-        /* Handle right-to-left layout */
-        if (pdcattr->dwLayout & LAYOUT_RTL)
-            lpSize->cx = -lpSize->cx;
     }
 
     if (pdcattr->dwLayout & LAYOUT_RTL)
     {
-        NtGdiMirrorWindowOrg(hdc);
         pdcattr->flXform |= (PAGE_EXTENTS_CHANGED|INVALIDATE_ATTRIBUTES|DEVICE_TO_WORLD_INVALID);
     }
     else if ((pdcattr->iMapMode == MM_ISOTROPIC) ||
@@ -638,8 +620,6 @@ SetWindowExtEx(
 
         pdcattr->szlWindowExt.cx = nXExtent;
         pdcattr->szlWindowExt.cy = nYExtent;
-        if (pdcattr->dwLayout & LAYOUT_RTL)
-            NtGdiMirrorWindowOrg(hdc);
 
         pdcattr->flXform |= (PAGE_EXTENTS_CHANGED|INVALIDATE_ATTRIBUTES|DEVICE_TO_WORLD_INVALID);
     }
@@ -674,10 +654,8 @@ SetViewportOrgEx(
     {
         lpPoint->x = pdcattr->ptlViewportOrg.x;
         lpPoint->y = pdcattr->ptlViewportOrg.y;
-        if (pdcattr->dwLayout & LAYOUT_RTL) lpPoint->x = -lpPoint->x;
     }
     pdcattr->flXform |= (PAGE_XLATE_CHANGED|WORLD_XFORM_CHANGED|DEVICE_TO_WORLD_INVALID);
-    if (pdcattr->dwLayout & LAYOUT_RTL) X = -X;
     pdcattr->ptlViewportOrg.x = X;
     pdcattr->ptlViewportOrg.y = Y;
     return TRUE;
@@ -867,7 +845,6 @@ OffsetViewportOrgEx(
     if (lpPoint)
     {
         *lpPoint = pdcattr->ptlViewportOrg;
-        if ( pdcattr->dwLayout & LAYOUT_RTL) lpPoint->x = -lpPoint->x;
     }
 
     if ( nXOffset || nYOffset != nXOffset )
@@ -882,7 +859,6 @@ OffsetViewportOrgEx(
         }
 
         pdcattr->flXform |= (PAGE_XLATE_CHANGED|WORLD_XFORM_CHANGED|DEVICE_TO_WORLD_INVALID);
-        if (pdcattr->dwLayout & LAYOUT_RTL) nXOffset = -nXOffset;
         pdcattr->ptlViewportOrg.x += nXOffset;
         pdcattr->ptlViewportOrg.y += nYOffset;
     }

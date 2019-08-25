@@ -7,6 +7,8 @@
 #define IntLPtoDP(pdc, ppt, count) do { \
         DC_vUpdateWorldToDevice(pdc); \
         DC_vXformWorldToDevice(pdc, count, (PPOINTL)(ppt), (PPOINTL)(ppt)); \
+        if (count == 2 && pdc->pdcattr->dwLayout & LAYOUT_RTL) \
+        RECTL_vMakeWellOrdered((PRECTL)(ppt)); \
     } while (0)
 #define CoordLPtoDP(pdc, ppt) \
         DC_vXformWorldToDevice(pdc, 1,  (PPOINTL)(ppt), (PPOINTL)(ppt));
