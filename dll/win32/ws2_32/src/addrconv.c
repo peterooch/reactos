@@ -492,3 +492,64 @@ WSANtohs(IN SOCKET s,
     return SOCKET_ERROR;
 }
 
+#if (NTDDI_VERSION >= NTDDI_VISTA)
+INT WSAAPI InetPtonW(INT family, LPCWSTR address, PVOID buffer)
+{
+    NTSTATUS Status;
+    PCWSTR ch;
+
+    if (!address || !buffer)
+    {
+        SetLastError(WSAEFAULT);
+        return -1;
+    }
+
+    switch (family)
+    {
+        case AF_INET:
+            Status = RtlIpv4StringToAddressW(address, TRUE, &ch, buffer);
+            break;
+        case AF_INET6:
+            Status = RtlIpv6StringToAddressW(address, &ch, buffer);
+            break;
+        default:
+            SetLastError(WSAEAFNOSUPPORT);
+            return -1;
+    }
+
+    if (Status == STATUS_INVALID_PARAMETER)
+        return 0;
+    
+    return 1;
+}
+
+INT WSAAPI inet_pton(INT family, LPCSTR address, PVOID buffer)
+{
+    NTSTATUS Status;
+    PCSTR ch;
+
+    if (!address || !buffer)
+    {
+        SetLastError(WSAEFAULT);
+        return -1;
+    }
+
+    switch (family)
+    {
+        case AF_INET:
+            Status = RtlIpv4StringToAddressA(address, TRUE, &ch, buffer);
+            break;
+        case AF_INET6:
+            Status = RtlIpv6StringToAddressA(address, &ch, buffer);
+            break;
+        default:
+            SetLastError(WSAEAFNOSUPPORT);
+            return -1;
+    }
+
+    if (Status == STATUS_INVALID_PARAMETER)
+        return 0;
+    
+    return 1;
+}
+#endif
