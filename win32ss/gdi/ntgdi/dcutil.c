@@ -839,7 +839,7 @@ NtGdiSetBoundsRect(
 
         if (!(flags & DCB_WINDOWMGR))
         {           
-           IntLPtoDP( pdc, (POINT *)&rcl, 2 );
+           RectIntLPtoDP( pdc, &rcl);
            RECTL_bUnionRect(&pdc->erclBoundsApp, &pdc->erclBoundsApp, &rcl);
         }
         else

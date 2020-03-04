@@ -285,7 +285,7 @@ NtGdiEllipse(
     RectBounds.top    = Top;
     RectBounds.bottom = Bottom;
 
-    IntLPtoDP(dc, (LPPOINT)&RectBounds, 2);
+    RectIntLPtoDP(dc, &RectBounds);
 
     RectBounds.left += dc->ptlDCOrig.x;
     RectBounds.right += dc->ptlDCOrig.x;
@@ -559,7 +559,7 @@ IntRectangle(PDC dc,
     DestRect.top    = min(TopRect,  BottomRect);
     DestRect.bottom = max(TopRect,  BottomRect);
 
-    IntLPtoDP(dc, (LPPOINT)&DestRect, 2);
+    RectIntLPtoDP(dc, &DestRect);
 
     DestRect.left   += dc->ptlDCOrig.x;
     DestRect.right  += dc->ptlDCOrig.x;
@@ -784,7 +784,7 @@ IntRoundRect(
     RectBounds.right = Right;
     RectBounds.bottom = Bottom;
 
-    IntLPtoDP(dc, (LPPOINT)&RectBounds, 2);
+    RectIntLPtoDP(dc, &RectBounds);
 
     RectBounds.left   += dc->ptlDCOrig.x;
     RectBounds.top    += dc->ptlDCOrig.y;
@@ -938,12 +938,6 @@ GreGradientFill(
         rclExtent.top = min(rclExtent.top, (pVertex + i)->y);
         rclExtent.bottom = max(rclExtent.bottom, (pVertex + i)->y);
     }
-    IntLPtoDP(pdc, (LPPOINT)&rclExtent, 2);
-
-    rclExtent.left   += pdc->ptlDCOrig.x;
-    rclExtent.right  += pdc->ptlDCOrig.x;
-    rclExtent.top    += pdc->ptlDCOrig.y;
-    rclExtent.bottom += pdc->ptlDCOrig.y;
 
     if (RECTL_bIsEmptyRect(&rclExtent))
     {
@@ -951,8 +945,15 @@ GreGradientFill(
         return TRUE;
     }
 
+    RectIntLPtoDP(pdc, &rclExtent);
+
+    rclExtent.left   += pdc->ptlDCOrig.x;
+    rclExtent.right  += pdc->ptlDCOrig.x;
+    rclExtent.top    += pdc->ptlDCOrig.y;
+    rclExtent.bottom += pdc->ptlDCOrig.y;
+
     ptlDitherOrg.x = ptlDitherOrg.y = 0;
-    IntLPtoDP(pdc, (LPPOINT)&ptlDitherOrg, 1);
+    //IntLPtoDP(pdc, (LPPOINT)&ptlDitherOrg, 1);
 
     ptlDitherOrg.x += pdc->ptlDCOrig.x;
     ptlDitherOrg.y += pdc->ptlDCOrig.y;

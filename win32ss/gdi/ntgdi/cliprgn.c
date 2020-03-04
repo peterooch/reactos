@@ -256,6 +256,7 @@ IntGdiExtSelectClipRect(
             }
         }
 
+        RectIntLPtoDP(dc, prcl);
         prgn = IntSysCreateRectpRgnIndirect(prcl);
 
         Ret = IntSelectClipRgn( dc, prgn, fnMode);
@@ -460,8 +461,7 @@ NtGdiExcludeClipRect(
     rect.top    = yTop;
     rect.right  = xRight;
     rect.bottom = yBottom;
-    RECTL_vMakeWellOrdered(&rect);
-    IntLPtoDP(pdc, (LPPOINT)&rect, 2);
+    RectIntLPtoDP(pdc, &rect);
 
     prgn = IntSysCreateRectpRgnIndirect(&rect);
     if ( prgn )
@@ -511,8 +511,7 @@ NtGdiIntersectClipRect(
     rect.top    = yTop;
     rect.right  = xRight;
     rect.bottom = yBottom;
-    RECTL_vMakeWellOrdered(&rect);
-    IntLPtoDP(pdc, (LPPOINT)&rect, 2);
+    RectIntLPtoDP(pdc, &rect);
 
     prgn = IntSysCreateRectpRgnIndirect(&rect);
     if ( prgn )
@@ -662,7 +661,7 @@ NtGdiRectVisible(
     prgn = dc->prgnRao ? dc->prgnRao : dc->prgnVis;
     if (prgn)
     {
-         IntLPtoDP(dc, (LPPOINT)&Rect, 2);
+         RectIntLPtoDP(dc, &Rect);
          Result = REGION_RectInRegion(prgn, &Rect);
     }
     DC_UnlockDc(dc);

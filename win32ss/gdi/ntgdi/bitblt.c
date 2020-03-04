@@ -71,7 +71,7 @@ NtGdiAlphaBlend(
     DestRect.top    = YOriginDest;
     DestRect.right  = XOriginDest + WidthDest;
     DestRect.bottom = YOriginDest + HeightDest;
-    IntLPtoDP(DCDest, (LPPOINT)&DestRect, 2);
+    RectIntLPtoDP(DCDest, &DestRect);
 
     DestRect.left   += DCDest->ptlDCOrig.x;
     DestRect.top    += DCDest->ptlDCOrig.y;
@@ -87,7 +87,7 @@ NtGdiAlphaBlend(
     SourceRect.top    = YOriginSrc;
     SourceRect.right  = XOriginSrc + WidthSrc;
     SourceRect.bottom = YOriginSrc + HeightSrc;
-    IntLPtoDP(DCSrc, (LPPOINT)&SourceRect, 2);
+    RectIntLPtoDP(DCSrc, &SourceRect);
 
     SourceRect.left   += DCSrc->ptlDCOrig.x;
     SourceRect.top    += DCSrc->ptlDCOrig.y;
@@ -249,7 +249,7 @@ NtGdiTransparentBlt(
     rcDest.top    = yDst;
     rcDest.right  = rcDest.left + cxDst;
     rcDest.bottom = rcDest.top + cyDst;
-    IntLPtoDP(DCDest, (LPPOINT)&rcDest, 2);
+    RectIntLPtoDP(DCDest, &rcDest);
 
     rcDest.left   += DCDest->ptlDCOrig.x;
     rcDest.top    += DCDest->ptlDCOrig.y;
@@ -260,7 +260,7 @@ NtGdiTransparentBlt(
     rcSrc.top    = ySrc;
     rcSrc.right  = rcSrc.left + cxSrc;
     rcSrc.bottom = rcSrc.top + cySrc;
-    IntLPtoDP(DCSrc, (LPPOINT)&rcSrc, 2);
+    RectIntLPtoDP(DCSrc, &rcSrc);
 
     rcSrc.left   += DCSrc->ptlDCOrig.x;
     rcSrc.top    += DCSrc->ptlDCOrig.y;
@@ -423,7 +423,7 @@ NtGdiMaskBlt(
     DestRect.top    = nYDest;
     DestRect.right  = nXDest + nWidth;
     DestRect.bottom = nYDest + nHeight;
-    IntLPtoDP(DCDest, (LPPOINT)&DestRect, 2);
+    RectIntLPtoDP(DCDest, &DestRect);
 
     DestRect.left   += DCDest->ptlDCOrig.x;
     DestRect.top    += DCDest->ptlDCOrig.y;
@@ -621,7 +621,7 @@ GreStretchBltMask(
     DestRect.top    = YOriginDest;
     DestRect.right  = XOriginDest+WidthDest;
     DestRect.bottom = YOriginDest+HeightDest;
-    IntLPtoDP(DCDest, (LPPOINT)&DestRect, 2);
+    RectIntLPtoDP(DCDest, &DestRect);
 
     DestRect.left   += DCDest->ptlDCOrig.x;
     DestRect.top    += DCDest->ptlDCOrig.y;
@@ -640,7 +640,7 @@ GreStretchBltMask(
 
     if (UsesSource)
     {
-        IntLPtoDP(DCSrc, (LPPOINT)&SourceRect, 2);
+        RectIntLPtoDP(DCSrc, &SourceRect);
 
         SourceRect.left   += DCSrc->ptlDCOrig.x;
         SourceRect.top    += DCSrc->ptlDCOrig.y;
@@ -815,7 +815,7 @@ IntPatBlt(
         DestRect.bottom = YLeft + 1;
     }
 
-    IntLPtoDP(pdc, (LPPOINT)&DestRect, 2);
+    RectIntLPtoDP(pdc, &DestRect);
 
     DestRect.left   += pdc->ptlDCOrig.x;
     DestRect.top    += pdc->ptlDCOrig.y;
@@ -1390,7 +1390,7 @@ NtGdiSetPixel(
 
        RECTL_vSetRect(&rcDst, x, y, x+1, y+1);
 
-       IntLPtoDP(pdc, (LPPOINT)&rcDst, 2);
+       RectIntLPtoDP(pdc, &rcDst);
 
        rcDst.left   += pdc->ptlDCOrig.x;
        rcDst.top    += pdc->ptlDCOrig.y;

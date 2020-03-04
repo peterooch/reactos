@@ -5,6 +5,7 @@
  * FILE:             win32ss/gdi/ntgdi/coord.c
  * PROGRAMERS:       Timo Kreuzer (timo.kreuzer@rectos.org)
  *                   Katayama Hirofumi MZ (katayama.hirofumi.mz@gmail.com)
+ *                   Baruch Rutman (peterooch at gmail dot com)
  */
 
 /* Coordinate translation overview
@@ -158,6 +159,9 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
     else
         FLOATOBJ_SetLong(&pmx->efM11, 1);
 
+    if (pdcattr->dwLayout & LAYOUT_RTL)
+        FLOATOBJ_Neg(&pmx->efM11);
+
     if (szlWindowExt.cy != 0)
     {
         FLOATOBJ_SetLong(&pmx->efM22, pszlViewPortExt->cy);
@@ -170,6 +174,19 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
     FLOATOBJ_SetLong(&pmx->efDx, -pdcattr->ptlWindowOrg.x);
     FLOATOBJ_Mul(&pmx->efDx, &pmx->efM11);
     FLOATOBJ_AddLong(&pmx->efDx, pdcattr->ptlViewportOrg.x);
+
+    /* Logic from construct_window_to_viewport function from the wine's gdi32 */
+    if (pdcattr->dwLayout & LAYOUT_RTL)
+    {
+        FLOATOBJ temp;
+        RECTL visRect;// = pdc->erclWindow;
+
+        REGION_GetRgnBox(pdc->prgnRao ? pdc->prgnRao : pdc->prgnVis, &visRect);
+        FLOATOBJ_SetLong(&temp, visRect.right - visRect.left - 1);
+        FLOATOBJ_Sub(&temp, &pmx->efDx);
+
+        pmx->efDx = temp;
+    }
 
     /* Calculate y offset */
     FLOATOBJ_SetLong(&pmx->efDy, -pdcattr->ptlWindowOrg.y);
@@ -1086,10 +1103,12 @@ DC_vSetLayout(
     IN DWORD dwLayout)
 {
     PDC_ATTR pdcattr = pdc->pdcattr;
+    DWORD dwPrevLayout = pdcattr->dwLayout;
 
     pdcattr->dwLayout = dwLayout;
 
-    if (!(dwLayout & LAYOUT_ORIENTATIONMASK)) return;
+    if (!(dwLayout & LAYOUT_ORIENTATIONMASK) || dwLayout == dwPrevLayout)
+        return;
 
     if (dwLayout & LAYOUT_RTL)
     {
@@ -1104,7 +1123,7 @@ DC_vSetLayout(
     //else
     //    pdcattr->ptlWindowOrg.x = wox - pdcattr->ptlWindowOrg.x;
 
-    if (!(pdcattr->flTextAlign & TA_CENTER)) pdcattr->flTextAlign |= TA_RIGHT;
+    if (!(pdcattr->flTextAlign & TA_CENTER)) pdcattr->flTextAlign ^= TA_RIGHT;
 
     if (pdc->dclevel.flPath & DCPATH_CLOCKWISE)
         pdc->dclevel.flPath &= ~DCPATH_CLOCKWISE;

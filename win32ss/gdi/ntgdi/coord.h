@@ -8,6 +8,11 @@
         DC_vUpdateWorldToDevice(pdc); \
         DC_vXformWorldToDevice(pdc, count, (PPOINTL)(ppt), (PPOINTL)(ppt)); \
     } while (0)
+#define RectIntLPtoDP(pdc, prect) do { \
+        DC_vUpdateWorldToDevice(pdc); \
+        DC_vXformWorldToDevice(pdc, 2, (PPOINTL)(prect), (PPOINTL)(prect)); \
+        RECTL_vMakeWellOrdered(prect); \
+    } while (0)
 #define CoordLPtoDP(pdc, ppt) \
         DC_vXformWorldToDevice(pdc, 1,  (PPOINTL)(ppt), (PPOINTL)(ppt));
 #define IntDPtoLP(pdc, ppt, count) do { \
