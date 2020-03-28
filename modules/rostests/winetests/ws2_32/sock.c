@@ -5025,7 +5025,7 @@ static void test_inet_pton(void)
         "127.0.0.1", "127.0.0.1", NULL},
         {AF_INET, 0, 0,
         "::1/128", NULL, NULL},
-        {AF_INET6, 0, 0,
+        {AF_INET6, 0, 0, //<- this 7
         "::1/128", NULL, NULL},
         {AF_UNSPEC, -1, WSAEAFNOSUPPORT,
         "broken", NULL, NULL},

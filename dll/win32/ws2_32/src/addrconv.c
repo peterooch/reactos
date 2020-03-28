@@ -492,64 +492,158 @@ WSANtohs(IN SOCKET s,
     return SOCKET_ERROR;
 }
 
-#if (NTDDI_VERSION >= NTDDI_VISTA)
-INT WSAAPI InetPtonW(INT family, LPCWSTR address, PVOID buffer)
+//#if (NTDDI_VERSION >= NTDDI_VISTA)
+INT
+WSAAPI
+InetPtonW(_In_ INT Family,
+    _In_ PCWSTR pszAddrString,
+    _Out_writes_bytes_(sizeof(IN_ADDR6)) PVOID pAddrBuf)
 {
     NTSTATUS Status;
     PCWSTR ch;
 
-    if (!address || !buffer)
+    if (!pszAddrString || !pAddrBuf)
     {
         SetLastError(WSAEFAULT);
         return -1;
     }
 
-    switch (family)
+    switch (Family)
     {
         case AF_INET:
-            Status = RtlIpv4StringToAddressW(address, TRUE, &ch, buffer);
+            Status = RtlIpv4StringToAddressW(pszAddrString, TRUE, &ch, pAddrBuf);
             break;
         case AF_INET6:
-            Status = RtlIpv6StringToAddressW(address, &ch, buffer);
+            Status = RtlIpv6StringToAddressW(pszAddrString, &ch, pAddrBuf);
             break;
         default:
             SetLastError(WSAEAFNOSUPPORT);
             return -1;
     }
+    SetLastError(0);
 
-    if (Status == STATUS_INVALID_PARAMETER)
+    if (!NT_SUCCESS(Status))
         return 0;
     
     return 1;
 }
 
-INT WSAAPI inet_pton(INT family, LPCSTR address, PVOID buffer)
+INT
+WSAAPI
+inet_pton(_In_ INT Family,
+    _In_ PCSTR pszAddrString,
+    _Out_writes_bytes_(sizeof(IN_ADDR6)) PVOID pAddrBuf)
 {
     NTSTATUS Status;
     PCSTR ch;
 
-    if (!address || !buffer)
+    if (!pszAddrString || !pAddrBuf)
     {
         SetLastError(WSAEFAULT);
         return -1;
     }
 
-    switch (family)
+    switch (Family)
     {
         case AF_INET:
-            Status = RtlIpv4StringToAddressA(address, TRUE, &ch, buffer);
+            Status = RtlIpv4StringToAddressA(pszAddrString, TRUE, &ch, pAddrBuf);
             break;
         case AF_INET6:
-            Status = RtlIpv6StringToAddressA(address, &ch, buffer);
+            Status = RtlIpv6StringToAddressA(pszAddrString, &ch, pAddrBuf);
             break;
         default:
             SetLastError(WSAEAFNOSUPPORT);
             return -1;
     }
+    SetLastError(0);
 
-    if (Status == STATUS_INVALID_PARAMETER)
+    if (!NT_SUCCESS(Status))
         return 0;
     
     return 1;
 }
-#endif
+
+/* taken from lib/rtl/network.c */
+#define IPV4_ADDR_STRING_MAX_LEN 16
+#define RTLIPV6A2S_MAX_LEN 46
+
+PCSTR
+WSAAPI
+inet_ntop(_In_ INT Family,
+    _In_ PVOID pAddr,
+    _Out_writes_(StringBufSize) PSTR pStringBuf,
+    _In_ size_t StringBufSize)
+{
+    if (!pAddr || !pStringBuf)
+    {
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return NULL;
+    }
+    
+    switch (Family)
+    {
+        case AF_INET:
+            if (StringBufSize < sizeof(*pStringBuf) * IPV4_ADDR_STRING_MAX_LEN)
+            {
+                SetLastError(ERROR_INVALID_PARAMETER);
+                return NULL;
+            }
+            RtlIpv4AddressToStringA(pAddr, pStringBuf);
+            break;
+        case AF_INET6:
+            if (StringBufSize < sizeof(*pStringBuf) * RTLIPV6A2S_MAX_LEN)
+            {
+                SetLastError(ERROR_INVALID_PARAMETER);
+                return NULL;
+            }
+            RtlIpv6AddressToStringA(pAddr, pStringBuf);
+            break;
+        default:
+            SetLastError(WSAEAFNOSUPPORT);
+            return NULL;
+            break;
+    }
+    SetLastError(0);
+    return pStringBuf;
+}
+
+PCWSTR
+WSAAPI
+InetNtopW(_In_ INT Family,
+    _In_ PVOID pAddr,
+    _Out_writes_(StringBufSize) PWSTR pStringBuf,
+    _In_ size_t StringBufSize)
+{
+    if (!pAddr || !pStringBuf)
+    {
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return NULL;
+    }
+
+    switch (Family)
+    {
+        case AF_INET:
+            if (StringBufSize < sizeof(*pStringBuf) * IPV4_ADDR_STRING_MAX_LEN)
+            {
+                SetLastError(ERROR_INVALID_PARAMETER);
+                return NULL;
+            }
+            RtlIpv4AddressToStringW(pAddr, pStringBuf);
+            break;
+        case AF_INET6:
+            if (StringBufSize < sizeof(*pStringBuf) * RTLIPV6A2S_MAX_LEN)
+            {
+                SetLastError(ERROR_INVALID_PARAMETER);
+                return NULL;
+            }
+            RtlIpv6AddressToStringW(pAddr, pStringBuf);
+            break;
+        default:
+            SetLastError(WSAEAFNOSUPPORT);
+            return NULL;
+            break;
+    }
+    SetLastError(0);
+    return pStringBuf;
+}
+//#endif
