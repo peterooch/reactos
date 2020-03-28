@@ -2351,13 +2351,17 @@ co_UserCreateWindowEx(CREATESTRUCTW* Cs,
    IntSendParentNotify(Window, WM_CREATE);
 
    /* Notify the shell that a new window was created */
-   if (UserIsDesktopWindow(Window->spwndParent) &&
-       Window->spwndOwner == NULL &&
-       (Window->style & WS_VISIBLE) &&
-       (!(Window->ExStyle & WS_EX_TOOLWINDOW) ||
-        (Window->ExStyle & WS_EX_APPWINDOW)))
+   if (Window->spwndOwner == NULL ||
+       !(Window->spwndOwner->style & WS_VISIBLE) ||
+       (Window->spwndOwner->ExStyle & WS_EX_TOOLWINDOW))
    {
-      co_IntShellHookNotify(HSHELL_WINDOWCREATED, (WPARAM)hWnd, 0);
+      if (UserIsDesktopWindow(Window->spwndParent) &&
+          (Window->style & WS_VISIBLE) &&
+          (!(Window->ExStyle & WS_EX_TOOLWINDOW) ||
+           (Window->ExStyle & WS_EX_APPWINDOW)))
+      {
+         co_IntShellHookNotify(HSHELL_WINDOWCREATED, (WPARAM)hWnd, 0);
+      }
    }
 
    /* Initialize and show the window's scrollbars */
@@ -4053,7 +4057,7 @@ NtUserQueryWindow(HWND hWnd, DWORD Index)
          break;
 
       case QUERY_WINDOW_ISHUNG:
-         Result = (DWORD_PTR)MsqIsHung(pWnd->head.pti);
+         Result = (DWORD_PTR)MsqIsHung(pWnd->head.pti, MSQ_HUNG);
          break;
 
       case QUERY_WINDOW_REAL_ID:

@@ -3,14 +3,10 @@ add_definitions(
     -D__WINESRC__
     -D_USE_MATH_DEFINES
     -DUSE_WIN32_OPENGL
+    -D__ROS_LONG64__
     -Dcopysignf=_copysignf)
 
 include_directories(BEFORE ${REACTOS_SOURCE_DIR}/sdk/include/reactos/wine)
-
-if(MSVC)
-    # error C4312: 'type cast': conversion from 'LONG' to 'void *' of greater size
-    replace_compile_flags("/we4312" " ")
-endif()
 
 # We name this d3dwine.dll, because the Virtualbox additions ship with a custom wined3d.dll
 # and it breaks everything if it is installed.
