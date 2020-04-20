@@ -7,8 +7,8 @@
 ---
 
 <p align=center>
-  <a href="https://reactos.org/project-news/reactos-0412-released">
-    <img alt="ReactOS 0.4.12 Release" src="https://img.shields.io/badge/release-0.4.12-0688CB.svg">
+  <a href="https://reactos.org/project-news/reactos-0413-released">
+    <img alt="ReactOS 0.4.13 Release" src="https://img.shields.io/badge/release-0.4.13-0688CB.svg">
   </a>
   <a href="https://reactos.org/download">
     <img alt="Download ReactOS" src="https://img.shields.io/badge/download-latest-0688CB.svg">
@@ -35,7 +35,6 @@
 [JIRA Bug Tracker](https://jira.reactos.org/issues) &bull; 
 [ReactOS Git mirror](https://git.reactos.org) &bull; 
 [Testman](https://reactos.org/testman/)
-
 
 ## What is ReactOS?
 
@@ -91,7 +90,7 @@ See ["File Bugs"](https://www.reactos.org/wiki/File_Bugs) for a guide.
 
 __NOTE:__ The bug tracker is _not_ for discussions. Please use `#reactos` Freenode IRC channel or our [forum](https://reactos.org/forum).
 
-## Contributing  ![prwelcome.badge]
+## Contributing [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/reactos/reactos) &bull; ![prwelcome.badge]
 
 We are always looking for developers! Check [how to contribute](CONTRIBUTING.md) if you are willing to participate.
 

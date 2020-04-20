@@ -33,6 +33,7 @@ list(APPEND SOURCE
     NtReadFile.c
     NtSaveKey.c
     NtSetInformationFile.c
+    NtSetInformationProcess.c
     NtSetValueKey.c
     NtSetVolumeInformationFile.c
     NtUnloadDriver.c
@@ -55,6 +56,7 @@ list(APPEND SOURCE
     RtlGetFullPathName_UstrEx.c
     RtlGetLengthWithoutTrailingPathSeperators.c
     RtlGetLongestNtPathLength.c
+    RtlGetNtProductType.c
     RtlHandle.c
     RtlImageRvaToVa.c
     RtlIsNameLegalDOS8Dot3.c
