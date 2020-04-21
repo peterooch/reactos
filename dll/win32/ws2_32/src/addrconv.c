@@ -519,7 +519,7 @@ InetPtonW(_In_ INT Family,
             SetLastError(WSAEAFNOSUPPORT);
             return -1;
     }
-    SetLastError(0);
+    SetLastError(ERROR_SUCCESS);
 
     if (!NT_SUCCESS(Status))
         return 0;
@@ -554,17 +554,13 @@ inet_pton(_In_ INT Family,
             SetLastError(WSAEAFNOSUPPORT);
             return -1;
     }
-    SetLastError(0);
+    SetLastError(ERROR_SUCCESS);
 
     if (!NT_SUCCESS(Status))
         return 0;
     
     return 1;
 }
-
-/* taken from lib/rtl/network.c */
-#define IPV4_ADDR_STRING_MAX_LEN 16
-#define RTLIPV6A2S_MAX_LEN 46
 
 PCSTR
 WSAAPI
@@ -574,14 +570,8 @@ inet_ntop(_In_ INT Family,
     _In_ size_t StringBufSize)
 {
     NTSTATUS Status;
-    size_t BufSize = StringBufSize;
+    ULONG BufSize = StringBufSize;
 
-    if (!pAddr || !pStringBuf)
-    {
-        SetLastError(ERROR_INVALID_PARAMETER);
-        return pStringBuf;
-    }
-    
     switch (Family)
     {
         case AF_INET:
@@ -592,10 +582,13 @@ inet_ntop(_In_ INT Family,
             break;
         default:
             SetLastError(WSAEAFNOSUPPORT);
-            break;
+            return pStringBuf;
     }
 
-    SetLastError(Status);
+    if (!NT_SUCCESS(Status))
+        SetLastError(ERROR_INVALID_PARAMETER);
+    else
+        SetLastError(ERROR_SUCCESS);
 
     return pStringBuf;
 }
@@ -608,14 +601,8 @@ InetNtopW(_In_ INT Family,
     _In_ size_t StringBufSize)
 {
     NTSTATUS Status;
-    size_t BufSize = StringBufSize;
- 
-    if (!pAddr || !pStringBuf)
-    {
-        SetLastError(ERROR_INVALID_PARAMETER);
-        return pStringBuf;
-    }
-    
+    ULONG BufSize = StringBufSize;
+
     switch (Family)
     {
         case AF_INET:
@@ -626,10 +613,13 @@ InetNtopW(_In_ INT Family,
             break;
         default:
             SetLastError(WSAEAFNOSUPPORT);
-            break;
+            return pStringBuf;
     }
 
-    SetLastError(Status);
+    if (!NT_SUCCESS(Status))
+        SetLastError(ERROR_INVALID_PARAMETER);
+    else
+        SetLastError(ERROR_SUCCESS);
 
     return pStringBuf;
 }
