@@ -181,7 +181,7 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
         FLOATOBJ temp;
         RECTL visRect;// = pdc->erclWindow;
 
-        REGION_GetRgnBox(pdc->prgnRao ? pdc->prgnRao : pdc->prgnVis, &visRect);
+        REGION_GetRgnBox(pdc->prgnVis, &visRect);
         FLOATOBJ_SetLong(&temp, visRect.right - visRect.left - 1);
         FLOATOBJ_Sub(&temp, &pmx->efDx);
 
