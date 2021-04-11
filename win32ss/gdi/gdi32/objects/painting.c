@@ -461,6 +461,9 @@ BitBlt(
         return PatBlt(hdcDest, xDest, yDest, cx, cy, dwRop);
     }
 
+    if (GetLayout(hdcDest) & LAYOUT_RTL) // Should be done in NtGdi (?)
+        return StretchBlt(hdcDest, xDest, yDest, cx, cy, hdcSrc, xSrc, ySrc, cx, cy, dwRop);
+
     /* For meta DCs we use StretchBlt */
     HANDLE_METADC(BOOL,
                   StretchBlt,
