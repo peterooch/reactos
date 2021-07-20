@@ -167,6 +167,25 @@ IntGdiSetTextAlign(HDC  hDC,
     return  prevAlign;
 }
 
+UINT
+FASTCALL
+IntGdiGetTextAlign(HDC hDC)
+{
+    UINT align;
+    PDC pdc;
+
+    pdc = DC_LockDc(hDC);
+
+    if (!pdc)
+    {
+        EngSetLastError(ERROR_INVALID_HANDLE);
+        return GDI_ERROR;
+    }
+    align = pdc->pdcattr->lTextAlign;
+    DC_UnlockDc(pdc);
+    return align;
+}
+
 COLORREF
 FASTCALL
 IntGdiSetTextColor(HDC hDC,

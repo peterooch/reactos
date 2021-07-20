@@ -877,6 +877,7 @@ IntPatBlt(
     }
 
     IntLPtoDP(pdc, (LPPOINT)&DestRect, 2);
+    RECTL_vMakeWellOrdered(&DestRect); 
 
     DestRect.left   += pdc->ptlDCOrig.x;
     DestRect.top    += pdc->ptlDCOrig.y;

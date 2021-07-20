@@ -158,6 +158,9 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
     else
         FLOATOBJ_SetLong(&pmx->efM11, 1);
 
+    if (pdcattr->dwLayout & LAYOUT_RTL)
+        FLOATOBJ_Neg(&pmx->efM11);
+
     if (szlWindowExt.cy != 0)
     {
         FLOATOBJ_SetLong(&pmx->efM22, pszlViewPortExt->cy);
@@ -170,6 +173,19 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
     FLOATOBJ_SetLong(&pmx->efDx, -pdcattr->ptlWindowOrg.x);
     FLOATOBJ_Mul(&pmx->efDx, &pmx->efM11);
     FLOATOBJ_AddLong(&pmx->efDx, pdcattr->ptlViewportOrg.x);
+
+    /* Logic from construct_window_to_viewport function from the wine's gdi32 */
+    if (pdcattr->dwLayout & LAYOUT_RTL)
+    {
+        FLOATOBJ temp;
+        RECTL visRect = pdc->erclWindow;
+
+        //REGION_GetRgnBox(pdc->prgnVis, &visRect);
+        FLOATOBJ_SetLong(&temp, visRect.right - visRect.left - 1);
+        FLOATOBJ_Sub(&temp, &pmx->efDx);
+
+        pmx->efDx = temp;
+    }
 
     /* Calculate y offset */
     FLOATOBJ_SetLong(&pmx->efDy, -pdcattr->ptlWindowOrg.y);
@@ -833,7 +849,7 @@ IntGdiSetMapMode(
     FLONG flXform;
     PDC_ATTR pdcattr = dc->pdcattr;
 
-    if (MapMode == pdcattr->iMapMode)
+    if (MapMode == pdcattr->iMapMode && (MapMode == MM_ISOTROPIC || MapMode == MM_ANISOTROPIC))
         return MapMode;
 
     flXform = pdcattr->flXform & ~(ISO_OR_ANISO_MAP_MODE|PTOD_EFM22_NEGATIVE|
@@ -900,7 +916,8 @@ IntGdiSetMapMode(
 
     /* Save the old map mode and set the new one */
     iPrevMapMode = pdcattr->iMapMode;
-    pdcattr->iMapMode = MapMode;
+    if (!(pdcattr->dwLayout & LAYOUT_RTL))
+        pdcattr->iMapMode = MapMode;
 
     /* Update xform flags */
     pdcattr->flXform = flXform | (PAGE_XLATE_CHANGED | PAGE_EXTENTS_CHANGED |
@@ -1089,10 +1106,11 @@ DC_vSetLayout(
     IN DWORD dwLayout)
 {
     PDC_ATTR pdcattr = pdc->pdcattr;
+    DWORD dwOldLayout = pdcattr->dwLayout;
 
     pdcattr->dwLayout = dwLayout;
 
-    if (!(dwLayout & LAYOUT_ORIENTATIONMASK)) return;
+    if (!(dwLayout & LAYOUT_ORIENTATIONMASK) || (dwOldLayout == dwLayout)) return;
 
     if (dwLayout & LAYOUT_RTL)
     {
@@ -1107,7 +1125,10 @@ DC_vSetLayout(
     //else
     //    pdcattr->ptlWindowOrg.x = wox - pdcattr->ptlWindowOrg.x;
 
-    if (!(pdcattr->flTextAlign & TA_CENTER)) pdcattr->flTextAlign |= TA_RIGHT;
+    if (!(pdcattr->flTextAlign & TA_CENTER) && (dwLayout & LAYOUT_RTL) != (dwOldLayout & LAYOUT_RTL)) 
+    {
+        pdcattr->flTextAlign ^= TA_RIGHT;
+    }
 
     if (pdc->dclevel.flPath & DCPATH_CLOCKWISE)
         pdc->dclevel.flPath &= ~DCPATH_CLOCKWISE;
@@ -1124,6 +1145,7 @@ DC_vSetLayout(
 //
 // The default is left to right. This function changes it to right to left, which
 // is the standard in Arabic and Hebrew cultures.
+// Layout change is reflected in matrix used for LPtoDP transformations.
 //
 /*
  * @implemented

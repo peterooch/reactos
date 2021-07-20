@@ -5966,6 +5966,7 @@ IntExtTextOutW(
     if (lprc && (fuOptions & (ETO_OPAQUE | ETO_CLIPPED)))
     {
         IntLPtoDP(dc, (POINT *)lprc, 2);
+        RECTL_vMakeWellOrdered(lprc);
     }
 
     if (pdcattr->flTextAlign & TA_UPDATECP)

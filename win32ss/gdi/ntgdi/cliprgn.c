@@ -460,8 +460,8 @@ NtGdiExcludeClipRect(
     rect.top    = yTop;
     rect.right  = xRight;
     rect.bottom = yBottom;
-    RECTL_vMakeWellOrdered(&rect);
     IntLPtoDP(pdc, (LPPOINT)&rect, 2);
+    RECTL_vMakeWellOrdered(&rect);
 
     prgn = IntSysCreateRectpRgnIndirect(&rect);
     if ( prgn )
@@ -511,8 +511,8 @@ NtGdiIntersectClipRect(
     rect.top    = yTop;
     rect.right  = xRight;
     rect.bottom = yBottom;
-    RECTL_vMakeWellOrdered(&rect);
     IntLPtoDP(pdc, (LPPOINT)&rect, 2);
+    RECTL_vMakeWellOrdered(&rect);
 
     prgn = IntSysCreateRectpRgnIndirect(&rect);
     if ( prgn )

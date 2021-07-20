@@ -169,6 +169,7 @@ IntGdiSetBkColor(
 INT FASTCALL IntGdiSetBkMode(HDC  hDC, INT  backgroundMode);
 COLORREF FASTCALL  IntGdiSetTextColor(HDC hDC, COLORREF color);
 UINT FASTCALL IntGdiSetTextAlign(HDC  hDC, UINT  Mode);
+UINT FASTCALL IntGdiGetTextAlign(HDC hDC);
 VOID FASTCALL DCU_SetDcUndeletable(HDC);
 BOOL FASTCALL IntSetDefaultRegion(PDC);
 ULONG TranslateCOLORREF(PDC pdc, COLORREF crColor);

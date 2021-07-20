@@ -928,6 +928,9 @@ GreGradientFill(
         return TRUE; // CHECKME
     }
 
+    for (i = 0; i < nVertex; i++)
+        IntLPtoDP(pdc, (LPPOINT)(pVertex + i), 1);
+
     /* Calculate extent */
     rclExtent.left = rclExtent.right = pVertex->x;
     rclExtent.top = rclExtent.bottom = pVertex->y;
@@ -938,7 +941,9 @@ GreGradientFill(
         rclExtent.top = min(rclExtent.top, (pVertex + i)->y);
         rclExtent.bottom = max(rclExtent.bottom, (pVertex + i)->y);
     }
+
     IntLPtoDP(pdc, (LPPOINT)&rclExtent, 2);
+    RECTL_vMakeWellOrdered(&rclExtent);
 
     rclExtent.left   += pdc->ptlDCOrig.x;
     rclExtent.right  += pdc->ptlDCOrig.x;
@@ -952,7 +957,8 @@ GreGradientFill(
     }
 
     ptlDitherOrg.x = ptlDitherOrg.y = 0;
-    IntLPtoDP(pdc, (LPPOINT)&ptlDitherOrg, 1);
+    if (!(pdc->pdcattr->dwLayout & LAYOUT_RTL)) /* RTL dc makes gradient go boom */
+        IntLPtoDP(pdc, (LPPOINT)&ptlDitherOrg, 1);
 
     ptlDitherOrg.x += pdc->ptlDCOrig.x;
     ptlDitherOrg.y += pdc->ptlDCOrig.y;
