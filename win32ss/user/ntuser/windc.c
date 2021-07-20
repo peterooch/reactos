@@ -613,7 +613,12 @@ UserGetDCEx(PWND Wnd OPTIONAL, HANDLE ClipRegion, ULONG Flags)
    {
       NtGdiSetLayout(Dce->hDC, -1, LAYOUT_RTL);
    }
-
+#if 0 //Edit controls use usp10 so need to write test
+   if (Wnd && Wnd->ExStyle & WS_EX_RTLREADING)
+   {
+      IntGdiSetTextAlign(Dce->hDC, IntGdiGetTextAlign(Dce->hDC) | TA_RTLREADING);
+   }
+#endif
    if (Dce->DCXFlags & DCX_PROCESSOWNED)
    {
       ppi = PsGetCurrentProcessWin32Process();

@@ -4571,6 +4571,14 @@ static LRESULT EDIT_WM_NCCreate(HWND hwnd, LPCREATESTRUCTW lpcs, BOOL unicode)
 	if (es->style & ES_COMBO)
 	   es->hwndListBox = GetDlgItem(es->hwndParent, ID_CB_LISTBOX);
 
+#ifdef __REACTOS__ /* WinSpy++ on Win2003 show that the RTL flag is being removed for edit controls */
+	if (lpcs->dwExStyle & WS_EX_LAYOUTRTL)
+	{
+		lpcs->dwExStyle |= WS_EX_RIGHT | WS_EX_RTLREADING | WS_EX_LEFTSCROLLBAR;
+		lpcs->dwExStyle &= ~WS_EX_LAYOUTRTL;
+		SetWindowLongPtrW(hwnd, GWL_EXSTYLE, lpcs->dwExStyle);
+	}
+#endif
         /* FIXME: should we handle changes to WS_EX_RIGHT style after creation? */
         if (lpcs->dwExStyle & WS_EX_RIGHT) es->style |= ES_RIGHT;
 

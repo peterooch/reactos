@@ -3097,6 +3097,12 @@ BOOL FASTCALL IntEndDeferWindowPosEx( HDWP hdwp, BOOL sAsync )
 
         UserRefObjectCo(pwnd, &Ref);
 
+        /* HACK, maybe use IntMapWindowPoints? */
+        if (pwnd->spwndParent && pwnd->ExStyle & WS_EX_LAYOUTRTL)
+        {
+            winpos->pos.x = pwnd->spwndParent->rcClient.right - winpos->pos.x - winpos->pos.cx;
+        }
+
         if ( sAsync )
         {
            LRESULT lRes;
