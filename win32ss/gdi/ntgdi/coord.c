@@ -157,10 +157,10 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
     }
     else
         FLOATOBJ_SetLong(&pmx->efM11, 1);
-
+#if 1
     if (pdcattr->dwLayout & LAYOUT_RTL)
         FLOATOBJ_Neg(&pmx->efM11);
-
+#endif
     if (szlWindowExt.cy != 0)
     {
         FLOATOBJ_SetLong(&pmx->efM22, pszlViewPortExt->cy);
@@ -173,20 +173,19 @@ DC_vGetPageToDevice(PDC pdc, MATRIX *pmx)
     FLOATOBJ_SetLong(&pmx->efDx, -pdcattr->ptlWindowOrg.x);
     FLOATOBJ_Mul(&pmx->efDx, &pmx->efM11);
     FLOATOBJ_AddLong(&pmx->efDx, pdcattr->ptlViewportOrg.x);
-
+#if 1
     /* Logic from construct_window_to_viewport function from the wine's gdi32 */
     if (pdcattr->dwLayout & LAYOUT_RTL)
     {
         FLOATOBJ temp;
-        RECTL visRect = pdc->erclWindow;
+        PRECTL visRect = &pdc->erclWindow;
 
-        //REGION_GetRgnBox(pdc->prgnVis, &visRect);
-        FLOATOBJ_SetLong(&temp, visRect.right - visRect.left - 1);
+        FLOATOBJ_SetLong(&temp, visRect->right - visRect->left - 1);
         FLOATOBJ_Sub(&temp, &pmx->efDx);
 
         pmx->efDx = temp;
     }
-
+#endif
     /* Calculate y offset */
     FLOATOBJ_SetLong(&pmx->efDy, -pdcattr->ptlWindowOrg.y);
     FLOATOBJ_Mul(&pmx->efDy, &pmx->efM22);
