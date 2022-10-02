@@ -27,9 +27,6 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <math.h>
-#ifdef __REACTOS__
-#include <wchar.h>
-#endif
 
 #include "windef.h"
 #include "winbase.h"
@@ -172,7 +169,7 @@ script_ranges[] =
     /* Control Pictures : U+2400 –U+243f */
     /* Optical Character Recognition : U+2440 –U+245f */
     /* Enclosed Alphanumerics : U+2460 –U+24ff */
-    /* Box Drawing : U+2500 –U+25ff */
+    /* Box Drawing : U+2500 –U+257f */
     /* Block Elements : U+2580 –U+259f */
     /* Geometric Shapes : U+25a0 –U+25ff */
     /* Miscellaneous Symbols : U+2600 –U+26ff */
@@ -305,332 +302,250 @@ script_ranges[] =
 const scriptData scriptInformation[] = {
     {{SCRIPT_UNDEFINED, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_NEUTRAL, 0, 0, 0, 0, ANSI_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     0x00000000,
-     {0}},
+     0x00000000, L""},
     {{Script_Latin, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ENGLISH, 0, 0, 0, 0, ANSI_CHARSET, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-     MS_MAKE_TAG('l','a','t','n'),
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     MS_MAKE_TAG('l','a','t','n'), L"Microsoft Sans Serif"},
     {{Script_CR, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_NEUTRAL, 0, 0, 0, 0, ANSI_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     0x00000000,
-     {0}},
+     0x00000000, L""},
     {{Script_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ENGLISH, 1, 0, 0, 0, ANSI_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     0x00000000,
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     0x00000000, L"Microsoft Sans Serif"},
     {{Script_Control, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ENGLISH, 0, 1, 0, 0, ANSI_CHARSET, 1, 0, 0, 0, 0, 0, 1, 0, 0},
-     0x00000000,
-     {0}},
+     0x00000000, L""},
     {{Script_Punctuation, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_NEUTRAL, 0, 0, 0, 0, ANSI_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     0x00000000,
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     0x00000000, L"Microsoft Sans Serif"},
     {{Script_Arabic, 1, 1, 0, 0, 0, 0, { 1,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ARABIC, 0, 1, 0, 0, ARABIC_CHARSET, 0, 0, 0, 0, 0, 0, 1, 1, 0},
-     MS_MAKE_TAG('a','r','a','b'),
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     MS_MAKE_TAG('a','r','a','b'), L"Microsoft Sans Serif"},
     {{Script_Arabic_Numeric, 0, 1, 0, 0, 0, 0, { 2,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ARABIC, 1, 1, 0, 0, ARABIC_CHARSET, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-     MS_MAKE_TAG('a','r','a','b'),
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     MS_MAKE_TAG('a','r','a','b'), L"Microsoft Sans Serif"},
     {{Script_Hebrew, 1, 1, 0, 0, 0, 0, { 1,0,0,0,0,0,0,0,0,0,0}},
      {LANG_HEBREW, 0, 1, 0, 1, HEBREW_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('h','e','b','r'),
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     MS_MAKE_TAG('h','e','b','r'), L"Microsoft Sans Serif"},
     {{Script_Syriac, 1, 1, 0, 0, 0, 0, { 1,0,0,0,0,0,0,0,0,0,0}},
      {LANG_SYRIAC, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 1, 0, 0, 1, 0},
-     MS_MAKE_TAG('s','y','r','c'),
-     {'E','s','t','r','a','n','g','e','l','o',' ','E','d','e','s','s','a',0}},
+     MS_MAKE_TAG('s','y','r','c'), L"Estrangelo Edessa"},
     {{Script_Persian, 0, 1, 0, 0, 0, 0, { 2,0,0,0,0,0,0,0,0,0,0}},
      {LANG_PERSIAN, 1, 1, 0, 0, ARABIC_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('a','r','a','b'),
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     MS_MAKE_TAG('a','r','a','b'), L"Microsoft Sans Serif"},
     {{Script_Thaana, 1, 1, 0, 0, 0, 0, { 1,0,0,0,0,0,0,0,0,0,0}},
      {LANG_DIVEHI, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('t','h','a','a'),
-     {'M','V',' ','B','o','l','i',0}},
+     MS_MAKE_TAG('t','h','a','a'), L"MV Boli"},
     {{Script_Greek, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_GREEK, 0, 0, 0, 0, GREEK_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('g','r','e','k'),
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     MS_MAKE_TAG('g','r','e','k'), L"Microsoft Sans Serif"},
     {{Script_Cyrillic, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_RUSSIAN, 0, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('c','y','r','l'),
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     MS_MAKE_TAG('c','y','r','l'), L"Microsoft Sans Serif"},
     {{Script_Armenian, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ARMENIAN, 0, 0, 0, 0, ANSI_CHARSET, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-     MS_MAKE_TAG('a','r','m','n'),
-     {'S','y','l','f','a','e','n',0}},
+     MS_MAKE_TAG('a','r','m','n'), L"Sylfaen"},
     {{Script_Georgian, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_GEORGIAN, 0, 0, 0, 0, ANSI_CHARSET, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-     MS_MAKE_TAG('g','e','o','r'),
-     {'S','y','l','f','a','e','n',0}},
+     MS_MAKE_TAG('g','e','o','r'), L"Sylfaen"},
     {{Script_Sinhala, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_SINHALESE, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('s','i','n','h'),
-     {'I','s','k','o','o','l','a',' ','P','o','t','a',0}},
+     MS_MAKE_TAG('s','i','n','h'), L"Iskoola Pota"},
     {{Script_Tibetan, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_TIBETAN, 0, 1, 1, 1, DEFAULT_CHARSET, 0, 0, 1, 0, 1, 0, 0, 0, 0},
-     MS_MAKE_TAG('t','i','b','t'),
-     {'M','i','c','r','o','s','o','f','t',' ','H','i','m','a','l','a','y','a',0}},
+     MS_MAKE_TAG('t','i','b','t'), L"Microsoft Himalaya"},
     {{Script_Tibetan_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_TIBETAN, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('t','i','b','t'),
-     {'M','i','c','r','o','s','o','f','t',' ','H','i','m','a','l','a','y','a',0}},
+     MS_MAKE_TAG('t','i','b','t'), L"Microsoft Himalaya"},
     {{Script_Phags_pa, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_MONGOLIAN, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('p','h','a','g'),
-     {'M','i','c','r','o','s','o','f','t',' ','P','h','a','g','s','P','a',0}},
+     MS_MAKE_TAG('p','h','a','g'), L"Microsoft PhagsPa"},
     {{Script_Thai, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_THAI, 0, 1, 1, 1, THAI_CHARSET, 0, 0, 1, 0, 1, 0, 0, 0, 1},
-     MS_MAKE_TAG('t','h','a','i'),
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     MS_MAKE_TAG('t','h','a','i'), L"Microsoft Sans Serif"},
     {{Script_Thai_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_THAI, 1, 1, 0, 0, THAI_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('t','h','a','i'),
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     MS_MAKE_TAG('t','h','a','i'), L"Microsoft Sans Serif"},
     {{Script_Lao, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_LAO, 0, 1, 1, 1, DEFAULT_CHARSET, 0, 0, 1, 0, 1, 0, 0, 0, 0},
-     MS_MAKE_TAG('l','a','o',' '),
-     {'D','o','k','C','h','a','m','p','a',0}},
+     MS_MAKE_TAG('l','a','o',' '), L"DokChampa"},
     {{Script_Lao_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_LAO, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('l','a','o',' '),
-     {'D','o','k','C','h','a','m','p','a',0}},
+     MS_MAKE_TAG('l','a','o',' '), L"DokChampa"},
     {{Script_Devanagari, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_HINDI, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-     MS_MAKE_TAG('d','e','v','a'),
-     {'M','a','n','g','a','l',0}},
+     MS_MAKE_TAG('d','e','v','a'), L"Mangal"},
     {{Script_Devanagari_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_HINDI, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('d','e','v','a'),
-     {'M','a','n','g','a','l',0}},
+     MS_MAKE_TAG('d','e','v','a'), L"Mangal"},
     {{Script_Bengali, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_BENGALI, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-     MS_MAKE_TAG('b','e','n','g'),
-     {'V','r','i','n','d','a',0}},
+     MS_MAKE_TAG('b','e','n','g'), L"Vrinda"},
     {{Script_Bengali_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_BENGALI, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('b','e','n','g'),
-     {'V','r','i','n','d','a',0}},
+     MS_MAKE_TAG('b','e','n','g'), L"Vrinda"},
     {{Script_Bengali_Currency, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_BENGALI, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('b','e','n','g'),
-     {'V','r','i','n','d','a',0}},
+     MS_MAKE_TAG('b','e','n','g'), L"Vrinda"},
     {{Script_Gurmukhi, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_PUNJABI, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-     MS_MAKE_TAG('g','u','r','u'),
-     {'R','a','a','v','i',0}},
+     MS_MAKE_TAG('g','u','r','u'), L"Raavi"},
     {{Script_Gurmukhi_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_PUNJABI, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('g','u','r','u'),
-     {'R','a','a','v','i',0}},
+     MS_MAKE_TAG('g','u','r','u'), L"Raavi"},
     {{Script_Gujarati, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_GUJARATI, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-     MS_MAKE_TAG('g','u','j','r'),
-     {'S','h','r','u','t','i',0}},
+     MS_MAKE_TAG('g','u','j','r'), L"Shruti"},
     {{Script_Gujarati_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_GUJARATI, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('g','u','j','r'),
-     {'S','h','r','u','t','i',0}},
+     MS_MAKE_TAG('g','u','j','r'), L"Shruti"},
     {{Script_Gujarati_Currency, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_GUJARATI, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('g','u','j','r'),
-     {'S','h','r','u','t','i',0}},
+     MS_MAKE_TAG('g','u','j','r'), L"Shruti"},
     {{Script_Oriya, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ORIYA, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-     MS_MAKE_TAG('o','r','y','a'),
-     {'K','a','l','i','n','g','a',0}},
+     MS_MAKE_TAG('o','r','y','a'), L"Kalinga"},
     {{Script_Oriya_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ORIYA, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('o','r','y','a'),
-     {'K','a','l','i','n','g','a',0}},
+     MS_MAKE_TAG('o','r','y','a'), L"Kalinga"},
     {{Script_Tamil, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_TAMIL, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-     MS_MAKE_TAG('t','a','m','l'),
-     {'L','a','t','h','a',0}},
+     MS_MAKE_TAG('t','a','m','l'), L"Latha"},
     {{Script_Tamil_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_TAMIL, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('t','a','m','l'),
-     {'L','a','t','h','a',0}},
+     MS_MAKE_TAG('t','a','m','l'), L"Latha"},
     {{Script_Telugu, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_TELUGU, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-     MS_MAKE_TAG('t','e','l','u'),
-     {'G','a','u','t','a','m','i',0}},
+     MS_MAKE_TAG('t','e','l','u'), L"Gautami"},
     {{Script_Telugu_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_TELUGU, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('t','e','l','u'),
-     {'G','a','u','t','a','m','i',0}},
+     MS_MAKE_TAG('t','e','l','u'), L"Gautami"},
     {{Script_Kannada, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_KANNADA, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-     MS_MAKE_TAG('k','n','d','a'),
-     {'T','u','n','g','a',0}},
+     MS_MAKE_TAG('k','n','d','a'), L"Tunga"},
     {{Script_Kannada_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_KANNADA, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('k','n','d','a'),
-     {'T','u','n','g','a',0}},
+     MS_MAKE_TAG('k','n','d','a'), L"Tunga"},
     {{Script_Malayalam, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_MALAYALAM, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-     MS_MAKE_TAG('m','l','y','m'),
-     {'K','a','r','t','i','k','a',0}},
+     MS_MAKE_TAG('m','l','y','m'), L"Kartika"},
     {{Script_Malayalam_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_MALAYALAM, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('m','l','y','m'),
-     {'K','a','r','t','i','k','a',0}},
+     MS_MAKE_TAG('m','l','y','m'), L"Kartika"},
     {{Script_Diacritical, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ENGLISH, 0, 1, 0, 1, ANSI_CHARSET, 0, 0, 0, 0, 0, 1, 1, 0, 0},
-     0x00000000,
-     {0}},
+     0x00000000, L""},
     {{Script_Punctuation2, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ENGLISH, 0, 0, 0, 0, ANSI_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('l','a','t','n'),
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     MS_MAKE_TAG('l','a','t','n'), L"Microsoft Sans Serif"},
     {{Script_Numeric2, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ENGLISH, 1, 0, 0, 0, ANSI_CHARSET, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-     0x00000000,
-     {0}},
+     0x00000000, L""},
     {{Script_Myanmar, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0x55, 0, 1, 1, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-     MS_MAKE_TAG('m','y','m','r'),
-     {'M','y','a','n','m','a','r',' ','T','e','x','t',0}},
+     MS_MAKE_TAG('m','y','m','r'), L"Myanmar Text"},
     {{Script_Myanmar_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0x55, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('m','y','m','r'),
-     {0}},
+     MS_MAKE_TAG('m','y','m','r'), L""},
     {{Script_Tai_Le, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('t','a','l','e'),
-     {'M','i','c','r','o','s','o','f','t',' ','T','a','i',' ','L','e',0}},
+     MS_MAKE_TAG('t','a','l','e'), L"Microsoft Tai Le"},
     {{Script_New_Tai_Lue, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('t','a','l','u'),
-     {'M','i','c','r','o','s','o','f','t',' ','N','e','w',' ','T','a','i',' ','L','u','e',0}},
+     MS_MAKE_TAG('t','a','l','u'), L"Microsoft New Tai Lue"},
     {{Script_New_Tai_Lue_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('t','a','l','u'),
-     {'M','i','c','r','o','s','o','f','t',' ','N','e','w',' ','T','a','i',' ','L','u','e',0}},
+     MS_MAKE_TAG('t','a','l','u'), L"Microsoft New Tai Lue"},
     {{Script_Khmer, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0x53, 0, 1, 1, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-     MS_MAKE_TAG('k','h','m','r'),
-     {'D','a','u','n','P','e','n','h',0}},
+     MS_MAKE_TAG('k','h','m','r'), L"DaunPenh"},
     {{Script_Khmer_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0x53, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('k','h','m','r'),
-     {'D','a','u','n','P','e','n','h',0}},
+     MS_MAKE_TAG('k','h','m','r'), L"DaunPenh"},
     {{Script_CJK_Han, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ENGLISH, 0, 0, 0, 0, ANSI_CHARSET, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-     MS_MAKE_TAG('h','a','n','i'),
-     {0}},
+     MS_MAKE_TAG('h','a','n','i'), L""},
     {{Script_Ideograph, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ENGLISH, 0, 0, 0, 0, ANSI_CHARSET, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-     MS_MAKE_TAG('h','a','n','i'),
-     {0}},
+     MS_MAKE_TAG('h','a','n','i'), L""},
     {{Script_Bopomofo, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ENGLISH, 0, 0, 0, 0, ANSI_CHARSET, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-     MS_MAKE_TAG('b','o','p','o'),
-     {0}},
+     MS_MAKE_TAG('b','o','p','o'), L""},
     {{Script_Kana, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ENGLISH, 0, 0, 0, 0, ANSI_CHARSET, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-     MS_MAKE_TAG('k','a','n','a'),
-     {0}},
+     MS_MAKE_TAG('k','a','n','a'), L""},
     {{Script_Hangul, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_KOREAN, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-     MS_MAKE_TAG('h','a','n','g'),
-     {0}},
+     MS_MAKE_TAG('h','a','n','g'), L""},
     {{Script_Yi, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ENGLISH, 0, 0, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-     MS_MAKE_TAG('y','i',' ',' '),
-     {'M','i','c','r','o','s','o','f','t',' ','Y','i',' ','B','a','i','t','i',0}},
+     MS_MAKE_TAG('y','i',' ',' '), L"Microsoft Yi Baiti"},
     {{Script_Ethiopic, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0x5e, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('e','t','h','i'),
-     {'N','y','a','l','a',0}},
+     MS_MAKE_TAG('e','t','h','i'), L"Nyala"},
     {{Script_Ethiopic_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0x5e, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('e','t','h','i'),
-     {'N','y','a','l','a',0}},
+     MS_MAKE_TAG('e','t','h','i'), L"Nyala"},
     {{Script_Mongolian, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_MONGOLIAN, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('m','o','n','g'),
-     {'M','o','n','g','o','l','i','a','n',' ','B','a','i','t','i',0}},
+     MS_MAKE_TAG('m','o','n','g'), L"Mongolian Baiti"},
     {{Script_Mongolian_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_MONGOLIAN, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('m','o','n','g'),
-     {'M','o','n','g','o','l','i','a','n',' ','B','a','i','t','i',0}},
+     MS_MAKE_TAG('m','o','n','g'), L"Mongolian Baiti"},
     {{Script_Tifinagh, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('t','f','n','g'),
-     {'E','b','r','i','m','a',0}},
+     MS_MAKE_TAG('t','f','n','g'), L"Ebrima"},
     {{Script_NKo, 1, 1, 0, 0, 0, 0, { 1,0,0,0,0,0,0,0,0,0,0}},
      {0, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('n','k','o',' '),
-     {'E','b','r','i','m','a',0}},
+     MS_MAKE_TAG('n','k','o',' '), L"Ebrima"},
     {{Script_Vai, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('v','a','i',' '),
-     {'E','b','r','i','m','a',0}},
+     MS_MAKE_TAG('v','a','i',' '), L"Ebrima"},
     {{Script_Vai_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('v','a','i',' '),
-     {'E','b','r','i','m','a',0}},
+     MS_MAKE_TAG('v','a','i',' '), L"Ebrima"},
     {{Script_Cherokee, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0x5c, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('c','h','e','r'),
-     {'P','l','a','n','t','a','g','e','n','e','t',' ','C','h','e','r','o','k','e','e',0}},
+     MS_MAKE_TAG('c','h','e','r'), L"Plantagenet Cherokee"},
     {{Script_Canadian, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0x5d, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('c','a','n','s'),
-     {'E','u','p','h','e','m','i','a',0}},
+     MS_MAKE_TAG('c','a','n','s'), L"Euphemia"},
     {{Script_Ogham, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('o','g','a','m'),
-     {'S','e','g','o','e',' ','U','I',' ','S','y','m','b','o','l',0}},
+     MS_MAKE_TAG('o','g','a','m'), L"Segoe UI Symbol"},
     {{Script_Runic, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('r','u','n','r'),
-     {'S','e','g','o','e',' ','U','I',' ','S','y','m','b','o','l',0}},
+     MS_MAKE_TAG('r','u','n','r'), L"Segoe UI Symbol"},
     {{Script_Braille, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ENGLISH, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('b','r','a','i'),
-     {'S','e','g','o','e',' ','U','I',' ','S','y','m','b','o','l',0}},
+     MS_MAKE_TAG('b','r','a','i'), L"Segoe UI Symbol"},
     {{Script_Surrogates, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_ENGLISH, 0, 1, 0, 1, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-     0x00000000,
-     {0}},
+     0x00000000, L""},
     {{Script_Private, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0, 0, 0, 0, 0, DEFAULT_CHARSET, 0, 1, 0, 0, 0, 0, 1, 0, 0},
-     0x00000000,
-     {0}},
+     0x00000000, L""},
     {{Script_Deseret, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('d','s','r','t'),
-     {'S','e','g','o','e',' ','U','I',' ','S','y','m','b','o','l',0}},
+     MS_MAKE_TAG('d','s','r','t'), L"Segoe UI Symbol"},
     {{Script_Osmanya, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('o','s','m','a'),
-     {'E','b','r','i','m','a',0}},
+     MS_MAKE_TAG('o','s','m','a'), L"Ebrima"},
     {{Script_Osmanya_Numeric, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0, 1, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('o','s','m','a'),
-     {'E','b','r','i','m','a',0}},
+     MS_MAKE_TAG('o','s','m','a'), L"Ebrima"},
     {{Script_MathAlpha, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {0, 0, 1, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('m','a','t','h'),
-     {'C','a','m','b','r','i','a',' ','M','a','t','h',0}},
+     MS_MAKE_TAG('m','a','t','h'), L"Cambria Math"},
     {{Script_Hebrew_Currency, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_HEBREW, 0, 1, 0, 0, HEBREW_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('h','e','b','r'),
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     MS_MAKE_TAG('h','e','b','r'), L"Microsoft Sans Serif"},
     {{Script_Vietnamese_Currency, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_VIETNAMESE, 0, 0, 0, 0, VIETNAMESE_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('l','a','t','n'),
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     MS_MAKE_TAG('l','a','t','n'), L"Microsoft Sans Serif"},
     {{Script_Thai_Currency, 0, 0, 0, 0, 0, 0, { 0,0,0,0,0,0,0,0,0,0,0}},
      {LANG_THAI, 0, 1, 0, 0, THAI_CHARSET, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-     MS_MAKE_TAG('t','h','a','i'),
-     {'M','i','c','r','o','s','o','f','t',' ','S','a','n','s',' ','S','e','r','i','f',0}},
+     MS_MAKE_TAG('t','h','a','i'), L"Microsoft Sans Serif"},
 };
 
 static const SCRIPT_PROPERTIES *script_props[] =
@@ -907,7 +822,7 @@ static HRESULT init_script_cache(const HDC hdc, SCRIPT_CACHE *psc)
         sc->otm->otmSize = size;
         GetOutlineTextMetricsW(hdc, size, sc->otm);
     }
-    sc->sfnt = (GetFontData(hdc, MS_MAKE_TAG('h','e','a','d'), 0, NULL, 0)!=GDI_ERROR);
+    sc->sfnt = (GetFontData(hdc, MS_MAKE_TAG('h','e','a','d'), 0, NULL, 0) != GDI_ERROR);
     if (!set_cache_font_properties(hdc, sc))
     {
         heap_free(sc);
@@ -940,7 +855,8 @@ static HRESULT init_script_cache(const HDC hdc, SCRIPT_CACHE *psc)
 static WCHAR mirror_char( WCHAR ch )
 {
     extern const WCHAR wine_mirror_map[] DECLSPEC_HIDDEN;
-    return ch + wine_mirror_map[wine_mirror_map[ch >> 8] + (ch & 0xff)];
+    WCHAR mirror = get_table_entry_16( wine_mirror_map, ch );
+    return mirror ? mirror : ch;
 }
 
 static DWORD decode_surrogate_pair(const WCHAR *str, unsigned int index, unsigned int end)
@@ -948,7 +864,7 @@ static DWORD decode_surrogate_pair(const WCHAR *str, unsigned int index, unsigne
     if (index < end-1 && IS_SURROGATE_PAIR(str[index],str[index+1]))
     {
         DWORD ch = 0x10000 + ((str[index] - 0xd800) << 10) + (str[index+1] - 0xdc00);
-        TRACE("Surrogate Pair %x %x => %x\n",str[index], str[index+1], ch);
+        TRACE("Surrogate Pair %x %x => %lx\n",str[index], str[index+1], ch);
         return ch;
     }
     return 0;
@@ -969,7 +885,6 @@ static int __cdecl usp10_compare_script_range(const void *key, const void *value
 static enum usp10_script get_char_script(const WCHAR *str, unsigned int index,
         unsigned int end, unsigned int *consumed)
 {
-    static const WCHAR latin_punc[] = {'#','$','&','\'',',',';','<','>','?','@','\\','^','_','`','{','|','}','~', 0x00a0, 0};
     struct usp10_script_range *range;
     WORD type = 0, type2 = 0;
     DWORD ch;
@@ -980,7 +895,7 @@ static enum usp10_script get_char_script(const WCHAR *str, unsigned int index,
         return Script_CR;
 
     /* These punctuation characters are separated out as Latin punctuation */
-    if (wcschr(latin_punc,str[index]))
+    if (wcschr(L"#$&',;<>?@\\^_`{|}~\x00a0", str[index]))
         return Script_Punctuation2;
 
     /* These chars are itemized as Punctuation by Windows */
@@ -1210,7 +1125,7 @@ HRESULT WINAPI ScriptRecordDigitSubstitution(LCID locale, SCRIPT_DIGITSUBSTITUTE
 {
     DWORD plgid, sub;
 
-    TRACE("0x%x, %p\n", locale, sds);
+    TRACE("0x%lx, %p\n", locale, sds);
 
     /* This implementation appears to be correct for all languages, but it's
      * not clear if sds->DigitSubstitute is ever set to anything except 
@@ -1515,9 +1430,6 @@ static HRESULT _ItemizeInternal(const WCHAR *pwcInChars, int cInChars,
         }
         else
         {
-            static const WCHAR math_punc[] = {'#','$','%','+',',','-','.','/',':',0x2212, 0x2044, 0x00a0,0};
-            static const WCHAR repeatable_math_punc[] = {'#','$','%','+','-','/',0x2212, 0x2044,0};
-
             if (!(strength = heap_calloc(cInChars, sizeof(*strength))))
                 goto nomemory;
             BIDI_GetStrengths(pwcInChars, cInChars, psControl, strength);
@@ -1536,7 +1448,7 @@ static HRESULT _ItemizeInternal(const WCHAR *pwcInChars, int cInChars,
             {
                 if (i > 0 && i < cInChars-1 &&
                     script_is_numeric(scripts[i-1]) &&
-                    wcschr(math_punc, pwcInChars[i]))
+                    wcschr(L"#$%+,-./:\x2212\x2044\x00a0", pwcInChars[i]))
                 {
                     if (script_is_numeric(scripts[i+1]))
                     {
@@ -1545,7 +1457,7 @@ static HRESULT _ItemizeInternal(const WCHAR *pwcInChars, int cInChars,
                         strength[i] = strength[i-1];
                         i++;
                     }
-                    else if (wcschr(repeatable_math_punc, pwcInChars[i]))
+                    else if (wcschr(L"#$%+-/\x2212\x2044", pwcInChars[i]))
                     {
                         int j;
                         for (j = i+1; j < cInChars; j++)
@@ -1964,12 +1876,11 @@ static void find_fallback_font(enum usp10_script scriptid, WCHAR *FaceName)
 
     if (!RegOpenKeyA(HKEY_CURRENT_USER, "Software\\Wine\\Uniscribe\\Fallback", &hkey))
     {
-        static const WCHAR szFmt[] = {'%','x',0};
         WCHAR value[10];
         DWORD count = LF_FACESIZE * sizeof(WCHAR);
         DWORD type;
 
-        swprintf(value, szFmt, scriptInformation[scriptid].scriptTag);
+        swprintf(value/*, ARRAY_SIZE(value)*/, L"%x", scriptInformation[scriptid].scriptTag);
         if (RegQueryValueExW(hkey, value, 0, &type, (BYTE *)FaceName, &count))
             lstrcpyW(FaceName,scriptInformation[scriptid].fallbackFont);
         RegCloseKey(hkey);
@@ -1997,7 +1908,7 @@ HRESULT WINAPI ScriptStringAnalyse(HDC hdc, const void *pString, int cString,
     BYTE   *BidiLevel;
     WCHAR *iString = NULL;
 
-    TRACE("(%p,%p,%d,%d,%d,0x%x,%d,%p,%p,%p,%p,%p,%p)\n",
+    TRACE("(%p,%p,%d,%d,%d,0x%lx,%d,%p,%p,%p,%p,%p,%p)\n",
           hdc, pString, cString, cGlyphs, iCharset, dwFlags, iReqWidth,
           psControl, psState, piDx, pTabdef, pbInClass, pssa);
 
@@ -2196,7 +2107,6 @@ static inline BOOL does_glyph_start_cluster(const SCRIPT_VISATTR *pva, const WOR
     return FALSE;
 }
 
-
 static HRESULT SS_ItemOut( SCRIPT_STRING_ANALYSIS ssa,
                            int iX,
                            int iY,
@@ -2229,7 +2139,8 @@ static HRESULT SS_ItemOut( SCRIPT_STRING_ANALYSIS ssa,
          (cEnd >= 0 && analysis->pItem[iItem].iCharPos >= cEnd))
             return S_OK;
 
-    CopyRect(&crc,prc);
+    if (prc)
+        memcpy(&crc, prc, sizeof(crc));
     if (fSelected)
     {
         BkMode = GetBkMode(analysis->hdc);
@@ -2327,7 +2238,7 @@ static HRESULT SS_ItemOut( SCRIPT_STRING_ANALYSIS ssa,
                        &analysis->glyphs[iItem].piAdvance[iGlyph], NULL,
                        &analysis->glyphs[iItem].pGoffset[iGlyph]);
 
-    TRACE("ScriptTextOut hr=%08x\n", hr);
+    TRACE("ScriptTextOut hr=%08lx\n", hr);
 
     if (fSelected)
     {
@@ -3012,7 +2923,7 @@ HRESULT WINAPI ScriptXtoCP(int iX,
         else /* (glyph_index >= cGlyphs) */
             i = cChars;
 
-        /* If not snaping in the reverse direction (such as Hebrew) Then 0
+        /* If not snapping in the reverse direction (such as Hebrew) Then 0
            point flow to the next character */
         if (direction < 0)
         {
@@ -3076,7 +2987,7 @@ HRESULT WINAPI ScriptIsComplex(const WCHAR *chars, int len, DWORD flag)
     enum usp10_script script;
     unsigned int i, consumed;
 
-    TRACE("(%s,%d,0x%x)\n", debugstr_wn(chars, len), len, flag);
+    TRACE("(%s,%d,0x%lx)\n", debugstr_wn(chars, len), len, flag);
 
     if (!chars || len < 0)
         return E_INVALIDARG;
@@ -3451,7 +3362,7 @@ HRESULT WINAPI ScriptPlaceOpenType( HDC hdc, SCRIPT_CACHE *psc, SCRIPT_ANALYSIS 
             else
             {
                 INT width;
-                if (!GetCharWidthW(hdc, pwGlyphs[i], pwGlyphs[i], &width)) return S_FALSE;
+                if (!GetCharWidth32W(hdc, pwGlyphs[i], pwGlyphs[i], &width)) return S_FALSE;
                 abc.abcB = width;
                 abc.abcA = abc.abcC = 0;
             }
@@ -3557,7 +3468,7 @@ HRESULT WINAPI ScriptGetCMap(HDC hdc, SCRIPT_CACHE *psc, const WCHAR *pwcInChars
     HRESULT hr;
     int i;
 
-    TRACE("(%p,%p,%s,%d,0x%x,%p)\n", hdc, psc, debugstr_wn(pwcInChars, cChars),
+    TRACE("(%p,%p,%s,%d,0x%lx,%p)\n", hdc, psc, debugstr_wn(pwcInChars, cChars),
           cChars, dwFlags, pwOutGlyphs);
 
     if ((hr = init_script_cache(hdc, psc)) != S_OK) return hr;
@@ -3575,7 +3486,8 @@ HRESULT WINAPI ScriptGetCMap(HDC hdc, SCRIPT_CACHE *psc, const WCHAR *pwcInChars
         {
             WORD glyph;
             if (!hdc) return E_PENDING;
-            if (GetGlyphIndicesW(hdc, &inChar, 1, &glyph, GGI_MARK_NONEXISTING_GLYPHS) == GDI_ERROR) return S_FALSE;
+            if (GetGlyphIndicesW(hdc, &inChar, 1, &glyph, GGI_MARK_NONEXISTING_GLYPHS) == GDI_ERROR)
+                return S_FALSE;
             if (glyph == 0xffff)
             {
                 hr = S_FALSE;
@@ -3609,10 +3521,10 @@ HRESULT WINAPI ScriptTextOut(const HDC hdc, SCRIPT_CACHE *psc, int x, int y, UIN
     if (!hdc || !psc) return E_INVALIDARG;
     if (!piAdvance || !psa || !pwGlyphs) return E_INVALIDARG;
 
-    fuOptions &= ETO_CLIPPED + ETO_OPAQUE;
+    fuOptions &= ETO_CLIPPED | ETO_OPAQUE;
     fuOptions |= ETO_IGNORELANGUAGE;
-    if  (!psa->fNoGlyphIndex)                                     /* Have Glyphs?                      */
-        fuOptions |= ETO_GLYPH_INDEX;                             /* Say don't do translation to glyph */
+    if (!psa->fNoGlyphIndex && *psc && ((ScriptCache *)*psc)->sfnt)
+        fuOptions |= ETO_GLYPH_INDEX; /* We do actually have glyph indices */
 
     if (!(lpDx = heap_calloc(cGlyphs, 2 * sizeof(*lpDx))))
         return E_OUTOFMEMORY;
@@ -3751,7 +3663,7 @@ HRESULT WINAPI ScriptGetGlyphABCWidth(HDC hdc, SCRIPT_CACHE *psc, WORD glyph, AB
  */
 HRESULT WINAPI ScriptLayout(int runs, const BYTE *level, int *vistolog, int *logtovis)
 {
-    int* indexs;
+    int* indices;
     int ich;
 
     TRACE("(%d, %p, %p, %p)\n", runs, level, vistolog, logtovis);
@@ -3759,31 +3671,31 @@ HRESULT WINAPI ScriptLayout(int runs, const BYTE *level, int *vistolog, int *log
     if (!level || (!vistolog && !logtovis))
         return E_INVALIDARG;
 
-    if (!(indexs = heap_calloc(runs, sizeof(*indexs))))
+    if (!(indices = heap_calloc(runs, sizeof(*indices))))
         return E_OUTOFMEMORY;
 
     if (vistolog)
     {
         for( ich = 0; ich < runs; ich++)
-            indexs[ich] = ich;
+            indices[ich] = ich;
 
         ich = 0;
         while (ich < runs)
-            ich += BIDI_ReorderV2lLevel(0, indexs+ich, level+ich, runs - ich, FALSE);
-        memcpy(vistolog, indexs, runs * sizeof(*vistolog));
+            ich += BIDI_ReorderV2lLevel(0, indices+ich, level+ich, runs - ich, FALSE);
+        memcpy(vistolog, indices, runs * sizeof(*vistolog));
     }
 
     if (logtovis)
     {
         for( ich = 0; ich < runs; ich++)
-            indexs[ich] = ich;
+            indices[ich] = ich;
 
         ich = 0;
         while (ich < runs)
-            ich += BIDI_ReorderL2vLevel(0, indexs+ich, level+ich, runs - ich, FALSE);
-        memcpy(logtovis, indexs, runs * sizeof(*logtovis));
+            ich += BIDI_ReorderL2vLevel(0, indices+ich, level+ich, runs - ich, FALSE);
+        memcpy(logtovis, indices, runs * sizeof(*logtovis));
     }
-    heap_free(indexs);
+    heap_free(indices);
 
     return S_OK;
 }
@@ -4096,6 +4008,18 @@ HRESULT WINAPI ScriptGetFontFeatureTags( HDC hdc, SCRIPT_CACHE *psc, SCRIPT_ANAL
     if ((hr = init_script_cache(hdc, psc)) != S_OK) return hr;
 
     return SHAPE_GetFontFeatureTags(hdc, (ScriptCache *)*psc, psa, tagScript, tagLangSys, cMaxTags, pFeatureTags, pcTags);
+}
+
+HRESULT WINAPI ScriptGetFontAlternateGlyphs( HDC hdc, SCRIPT_CACHE *sc, SCRIPT_ANALYSIS *sa, OPENTYPE_TAG tag_script, OPENTYPE_TAG tag_langsys, OPENTYPE_TAG tag_feature,
+                 WORD id, int size, WORD *list, int *count )
+{
+    FIXME("(%p, %p, %p, %s, %s, %s, 0x%04x, %d, %p, %p)\n", hdc, sc, sa, debugstr_an((char*)&tag_script,4), debugstr_an((char*)&tag_langsys,4),
+          debugstr_an((char*)&tag_feature,4), id, size, list, count);
+
+    if(count)
+        *count = 0;
+
+    return E_NOTIMPL;
 }
 
 #ifdef __REACTOS__

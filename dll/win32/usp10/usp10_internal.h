@@ -19,8 +19,6 @@
  *
  */
 
-#pragma once
-
 #include "wine/list.h"
 
 #define MS_MAKE_TAG( _x1, _x2, _x3, _x4 ) \
@@ -235,9 +233,14 @@ static inline BOOL is_consonant( int type )
     return (type == lex_Ra || type == lex_Consonant);
 }
 
-static inline unsigned short get_table_entry( const unsigned short *table, WCHAR ch )
+static inline unsigned short get_table_entry_16( const unsigned short *table, WCHAR ch )
 {
     return table[table[table[ch >> 8] + ((ch >> 4) & 0x0f)] + (ch & 0xf)];
+}
+
+static inline unsigned short get_table_entry_32( const unsigned short *table, UINT ch )
+{
+    return table[table[table[table[ch >> 12] + ((ch >> 8) & 0x0f)] + ((ch >> 4) & 0x0f)] + (ch & 0xf)];
 }
 
 typedef int (*lexical_function)(WCHAR c);
@@ -255,8 +258,8 @@ BOOL BIDI_DetermineLevels(const WCHAR *string, unsigned int count, const SCRIPT_
         const SCRIPT_CONTROL *c, WORD *levels, WORD *overrides) DECLSPEC_HIDDEN;
 BOOL BIDI_GetStrengths(const WCHAR *string, unsigned int count,
         const SCRIPT_CONTROL *c, WORD *strength) DECLSPEC_HIDDEN;
-INT BIDI_ReorderV2lLevel(int level, int *pIndexs, const BYTE* plevel, int cch, BOOL fReverse) DECLSPEC_HIDDEN;
-INT BIDI_ReorderL2vLevel(int level, int *pIndexs, const BYTE* plevel, int cch, BOOL fReverse) DECLSPEC_HIDDEN;
+INT BIDI_ReorderV2lLevel(int level, int *pIndices, const BYTE* plevel, int cch, BOOL fReverse) DECLSPEC_HIDDEN;
+INT BIDI_ReorderL2vLevel(int level, int *pIndices, const BYTE* plevel, int cch, BOOL fReverse) DECLSPEC_HIDDEN;
 void SHAPE_ContextualShaping(HDC hdc, ScriptCache *psc, SCRIPT_ANALYSIS *psa, WCHAR* pwcChars, INT cChars, WORD* pwOutGlyphs, INT* pcGlyphs, INT cMaxGlyphs, WORD *pwLogClust) DECLSPEC_HIDDEN;
 void SHAPE_ApplyDefaultOpentypeFeatures(HDC hdc, ScriptCache *psc, SCRIPT_ANALYSIS *psa, WORD* pwOutGlyphs, INT* pcGlyphs, INT cMaxGlyphs, INT cChars, WORD *pwLogClust) DECLSPEC_HIDDEN;
 void SHAPE_ApplyOpenTypePositions(HDC hdc, ScriptCache *psc, SCRIPT_ANALYSIS *psa, const WORD* pwGlyphs, INT cGlyphs, int *piAdvance, GOFFSET *pGoffset ) DECLSPEC_HIDDEN;
